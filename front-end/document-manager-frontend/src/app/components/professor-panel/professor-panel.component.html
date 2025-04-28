@@ -1,0 +1,55 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Panel de Profesores</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <!-- Formulario para agregar temas -->
+    <h3>Agregar Nuevo Tema de Tesis</h3>
+    <form (ngSubmit)="addTopic()">
+      <mat-form-field appearance="fill">
+        <mat-label>Título del Tema</mat-label>
+        <input matInput [(ngModel)]="newTopic.title" name="title" required />
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Descripción</mat-label>
+        <input matInput [(ngModel)]="newTopic.description" name="description" required />
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Profesor</mat-label>
+        <input matInput [(ngModel)]="newTopic.professor" name="professor" required />
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Cupos Disponibles</mat-label>
+        <input matInput type="number" [(ngModel)]="newTopic.avaliableSlots" name="avaliableSlots" required />
+      </mat-form-field>
+      <button mat-raised-button color="primary" type="submit">Agregar Tema</button>
+    </form>
+
+    <!-- Tabla de temas de tesis -->
+    <h3>Lista de Temas de Tesis</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Título</th>
+          <th>Descripción</th>
+          <th>Profesor</th>
+          <th>Cupos</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let topic of thesisTopics">
+          <td>{{ topic.title }}</td>
+          <td>{{ topic.description }}</td>
+          <td>{{ topic.professor }}</td>
+          <td>{{ topic.avaliableSlots }}</td>
+          <td>
+            <button mat-icon-button (click)="deleteTopic(topic.id)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </mat-card-content>
+</mat-card>

@@ -1,0 +1,29 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Lista de Documentos</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <!-- Campo de búsqueda -->
+    <mat-form-field appearance="fill">
+      <mat-label>Buscar documento</mat-label>
+      <input matInput [formControl]="searchControl" placeholder="Escribe para buscar..." />
+      <mat-icon matSuffix>search</mat-icon>
+    </mat-form-field>
+
+    <!-- Lista de documentos -->
+    <mat-list>
+      <mat-list-item *ngFor="let document of filteredDocuments">
+        <span>{{ document.filename }}</span>
+        <button mat-icon-button (click)="previewDocument(document._id)">
+          <mat-icon>visibility</mat-icon>
+        </button>
+        <button mat-icon-button (click)="downloadDocument(document._id, document.filename)">
+          <mat-icon>download</mat-icon>
+        </button>
+        <button mat-icon-button (click)="deleteDocument(document._id)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </mat-list-item>
+    </mat-list>
+  </mat-card-content>
+</mat-card>

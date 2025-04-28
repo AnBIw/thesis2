@@ -1,0 +1,10 @@
+<div class="container"> 
+   <div class="column">
+    <app-professor-panel></app-professor-panel>
+  </div>
+  <div class="column">
+    <app-upload-document (documentUploaded)="documentList.onDocumentUploaded()"></app-upload-document>
+    <app-document-list #documentList></app-document-list>
+  </div>
+
+</div>
