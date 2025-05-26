@@ -20,4 +20,11 @@ export class ThesisTopicsController {
   delete(@Param('id') id: string): void {
     this.thesisTopicsService.delete(id);
   }
+  @Post(':id/enroll')
+  async enrollStudent(
+  @Param('id') id: string,
+  @Body('email') email: string,
+  ): Promise<void> {
+  await this.thesisTopicsService.enrollStudent(id, email);
+}
 }

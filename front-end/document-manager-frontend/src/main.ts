@@ -4,12 +4,14 @@ import { provideHttpClient } from '@angular/common/http';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { importProvidersFrom } from '@angular/core';
 import { MatNativeDateModule } from '@angular/material/core';
-
+import { provideRouter, RoutesRecognized } from '@angular/router';
+import { routes } from './app/app.routes';
 
 bootstrapApplication(AppComponent, {
   providers: [
     provideHttpClient(), // Para usar HttpClient
     provideAnimations(), // Para animaciones
     importProvidersFrom(MatNativeDateModule), // Para Angular Material
+    provideRouter(routes) // Proporciona las rutas definidas en app.routes.ts
   ],
 });

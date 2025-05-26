@@ -1,0 +1,60 @@
+<div class="contenedor">
+  <mat-card>
+    <mat-card-content>
+      <h3>Lista de Temas de Tesis por Profesor</h3>
+      <div *ngFor="let professor of professors">
+        <!-- Información del Profesor -->
+        <mat-card class="professor-card">
+          <mat-card-header>
+            <mat-card-title>{{ professor.name }}</mat-card-title>
+            <mat-card-subtitle>{{ professor.specialty }}</mat-card-subtitle>
+          </mat-card-header>
+        </mat-card>
+
+        <!-- Tabla de Temas de Tesis -->
+        <table mat-table [dataSource]="getTopicsByProfessor(professor.name)" class="mat-elevation-z8">
+          <!-- Título Column -->
+          <ng-container matColumnDef="title">
+            <th mat-header-cell *matHeaderCellDef> Título </th>
+            <td mat-cell *matCellDef="let topic"> {{ topic.title }} </td>
+          </ng-container>
+
+          <!-- Descripción Column -->
+          <ng-container matColumnDef="description">
+            <th mat-header-cell *matHeaderCellDef> Descripción </th>
+            <td mat-cell *matCellDef="let topic"> {{ topic.description }} </td>
+          </ng-container>
+
+          <!-- Cupos Column -->
+          <ng-container matColumnDef="avaliableSlots">
+            <th mat-header-cell *matHeaderCellDef> Cupos </th>
+            <td mat-cell *matCellDef="let topic"> {{ topic.avaliableSlots }} </td>
+          </ng-container>
+
+          <!-- Botón de Borrar -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef> Acciones </th>
+            <td mat-cell *matCellDef="let topic">
+              <button 
+                mat-icon-button
+                *ngIf="userRole === 'professor'"
+                (click)="deleteTopic(topic.id)">
+                <mat-icon>delete</mat-icon>
+              </button>
+              <button 
+              mat-icon-button
+              *ngIf="userRole === 'students'"
+              (click)="enrollStudent(topic.id)">
+              <mat-icon>person_add</mat-icon>
+              </button>
+              </td>
+          </ng-container>
+
+          <!-- Header and Row Definitions -->
+          <tr mat-header-row *matHeaderRowDef="['title', 'description', 'avaliableSlots', 'actions']"></tr>
+          <tr mat-row *matRowDef="let row; columns: ['title', 'description', 'avaliableSlots', 'actions'];"></tr>
+        </table>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

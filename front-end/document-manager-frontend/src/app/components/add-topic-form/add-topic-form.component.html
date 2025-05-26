@@ -1,0 +1,23 @@
+<div class="contenedor">
+  </div>
+  <mat-card>
+    <mat-card-content>
+      <!-- Formulario para agregar temas -->
+      <h3>Agregar Nuevo Tema de Tesis</h3>
+      <form (ngSubmit)="addTopic()">
+        <mat-form-field appearance="fill">
+          <mat-label>Título del Tema</mat-label>
+          <input matInput [(ngModel)]="newTopic.title" name="title" required />
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+          <mat-label>Descripción</mat-label>
+          <input matInput [(ngModel)]="newTopic.description" name="description" required />
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+          <mat-label>Cupos Disponibles</mat-label>
+          <input matInput type="number" [(ngModel)]="newTopic.avaliableSlots" name="avaliableSlots" required />
+        </mat-form-field>
+        <button mat-raised-button color="primary" type="submit">Agregar Tema</button>
+      </form>
+    </mat-card-content>
+  </mat-card>

@@ -8,23 +8,32 @@ import { ThesisTopic } from '../models/thesis-topic.model';
 })
 
 export class ThesisService {
-    private apiURL = 'http://localhost:3000/thesis-topics';
+    private apiURL = 'http://localhost:3000/auth'; // Cambia la URL si es necesario
 
     constructor(private http: HttpClient) {}
 
+    getProfessors(): Observable<{ name: string; specialty: string }[]> {
+        return this.http.get<{ name: string; specialty: string }[]>(`${this.apiURL}/profesores`);
+    }
+    private url1 = 'http://localhost:3000/thesis-topics';
+
     getThesisTopics(): Observable<ThesisTopic[]> {
-        return this.http.get<ThesisTopic[]>(this.apiURL);
+        return this.http.get<ThesisTopic[]>(this.url1);
     }
 
     addThesisTopic(thesisTopic: ThesisTopic): Observable<ThesisTopic> {
-        return this.http.post<ThesisTopic>(this.apiURL, thesisTopic);
+        return this.http.post<ThesisTopic>(this.url1, thesisTopic);
     }
 
     deleteThesisTopic(id: string): Observable<ThesisTopic> {
-        return this.http.delete<ThesisTopic>(`${this.apiURL}/${id}`);
+        return this.http.delete<ThesisTopic>(`${this.url1}/${id}`);
     }
 
     updateThesisTopic(thesisTopic: ThesisTopic): Observable<ThesisTopic> {
-        return this.http.put<ThesisTopic>(`${this.apiURL}/${thesisTopic.id}`, thesisTopic);
+        return this.http.put<ThesisTopic>(`${this.url1}/${thesisTopic.id}`, thesisTopic);
     }
+
+    enrollStudent(topicId: string, email: string): Observable<void> {
+        return this.http.post<void>(`${this.url1}/${topicId}/enroll`, { email });
+      }
 }
