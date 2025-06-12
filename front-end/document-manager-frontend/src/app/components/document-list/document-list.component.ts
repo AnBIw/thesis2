@@ -10,6 +10,7 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatTable, MatTableModule } from '@angular/material/table';
 
 @Component({
   selector: 'app-document-list',
@@ -23,6 +24,7 @@ import { MatInputModule } from '@angular/material/input';
     MatListModule,
     MatIconModule,
     MatButtonModule,
+    MatTableModule
   ],
   templateUrl: './document-list.component.html',
   styleUrls: ['./document-list.component.css'],

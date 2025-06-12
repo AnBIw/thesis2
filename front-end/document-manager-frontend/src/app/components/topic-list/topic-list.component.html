@@ -31,6 +31,12 @@
             <td mat-cell *matCellDef="let topic"> {{ topic.avaliableSlots }} </td>
           </ng-container>
 
+          <!-- Cupos Column -->
+          <ng-container matColumnDef="enrollStudent">
+            <th mat-header-cell *matHeaderCellDef> Estudiantes Inscritos</th>
+            <td mat-cell *matCellDef="let topic"></td>
+          </ng-container>
+
           <!-- Botón de Borrar -->
           <ng-container matColumnDef="actions">
             <th mat-header-cell *matHeaderCellDef> Acciones </th>
@@ -51,8 +57,8 @@
           </ng-container>
 
           <!-- Header and Row Definitions -->
-          <tr mat-header-row *matHeaderRowDef="['title', 'description', 'avaliableSlots', 'actions']"></tr>
-          <tr mat-row *matRowDef="let row; columns: ['title', 'description', 'avaliableSlots', 'actions'];"></tr>
+          <tr mat-header-row *matHeaderRowDef="['title', 'description', 'avaliableSlots', 'enrollStudent', 'actions']"></tr>
+          <tr mat-row *matRowDef="let row; columns: ['title', 'description', 'avaliableSlots', 'enrollStudent', 'actions'];"></tr>
         </table>
       </div>
     </mat-card-content>

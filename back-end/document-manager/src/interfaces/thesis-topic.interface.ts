@@ -1,7 +1,7 @@
 export interface ThesisTopic {
-    id: string;
-    title: string;
-    professor: string;
-    availableSlots: number;
-    enrolledStudents: string[];
-  }
+  title: string;
+  description: string;
+  professor: string;
+  avaliableSlots: number;
+  enrolledStudents: string[];
+}

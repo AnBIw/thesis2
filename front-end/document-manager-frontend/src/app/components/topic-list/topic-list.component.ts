@@ -31,14 +31,12 @@ import { MatTableModule } from '@angular/material/table'; // Importa MatTableMod
 export class TopicListComponent implements OnInit {
   thesisTopics: ThesisTopic[] = [];
   professors: { name: string; specialty: string }[] = [];
-  displayedColumns: string[] = ['title', 'description', 'avaliableSlots'];
-  userRole: string = localStorage.getItem('role') || '';
+  displayedColumns: string[] = ['title', 'description', 'avaliableSlots', 'enrolledStudents'];
+  userRole: string = localStorage.getItem('userRole') || '';
 
   constructor(private thesisService: ThesisService) {}
 
   ngOnInit(): void {
-    this.userRole = localStorage.getItem('userRole') || ''; // Obtén el rol del usuario desde localStorage
-    console.log('Rol del usuario:', this.userRole); // Verifica el valor del rol
     this.loadThesisTopics();
     this.getProfessors();
     this.getThesisTopics();
@@ -54,7 +52,7 @@ export class TopicListComponent implements OnInit {
       },
     });
   }
-  
+  //cargo a todos los profesores de la base de datos + especialidades
   getProfessors(): void {
     this.thesisService.getProfessors().subscribe(
       (professors) => {
@@ -65,11 +63,12 @@ export class TopicListComponent implements OnInit {
       }
     );
   }
-
+  //cargo los temas de tesis 
   getThesisTopics(): void {
     this.thesisService.getThesisTopics().subscribe(
       (topics) => {
         this.thesisTopics = topics;
+        //console.log('Thesis topics loaded:', this.thesisTopics);
       },
       (error) => {
         console.error('Error fetching thesis topics:', error);

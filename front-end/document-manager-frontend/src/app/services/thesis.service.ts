@@ -15,11 +15,14 @@ export class ThesisService {
     getProfessors(): Observable<{ name: string; specialty: string }[]> {
         return this.http.get<{ name: string; specialty: string }[]>(`${this.apiURL}/profesores`);
     }
+      getThesisTopics(): Observable<ThesisTopic[]> {
+        return this.http.get<ThesisTopic[]>(`${this.apiURL}/temas`);
+    }
     private url1 = 'http://localhost:3000/thesis-topics';
 
-    getThesisTopics(): Observable<ThesisTopic[]> {
-        return this.http.get<ThesisTopic[]>(this.url1);
-    }
+    // getThesisTopics(): Observable<ThesisTopic[]> {
+    //     return this.http.get<ThesisTopic[]>(this.url1);
+    // }
 
     addThesisTopic(thesisTopic: ThesisTopic): Observable<ThesisTopic> {
         return this.http.post<ThesisTopic>(this.url1, thesisTopic);

@@ -35,13 +35,13 @@ export class AddTopicFormComponent {
     title: '',
     description: '',
     avaliableSlots: 0,
-    students: [],
+    enrolledStudents: [],
     professor: localStorage.getItem('name') || '', // Obtiene el nombre del profesor desde el localStorage
   };
   constructor(private thesisService: ThesisService) {}
 
   ngOnInit(): void {
-    console.log(this.thesisTopics);
+    //console.log(this.thesisTopics);
   }
 
   addTopic(): void {
@@ -53,9 +53,9 @@ export class AddTopicFormComponent {
           description: '', 
           professor: localStorage.getItem('name') || '', // Obtén el nombre del profesor desde el localStorage
           avaliableSlots: 0, 
-          students: [] 
+          enrolledStudents	: [] 
         };
-      //this.topicAdded.emit(); // Emitir el evento cuando se agrega un tema
+      console.log('Thesis topic added successfully', response);
       },
       error: (error) => {
         console.error('Error adding thesis topic', error);

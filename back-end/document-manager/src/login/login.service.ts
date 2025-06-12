@@ -21,6 +21,12 @@ export class LoginService {
     return this.userModel.find({ role: 'professor' }).exec();
   }
 
+  async getThesisTopics(): Promise<any[]> {
+    return this.userModel.find({ role: 'professor' }, 'topics').exec().then(users => {
+      return users.flatMap(user => user.topics);
+    });
+  }
+
   create(createLoginDto: CreateLoginDto) {
     return 'This action adds a new login';
   }

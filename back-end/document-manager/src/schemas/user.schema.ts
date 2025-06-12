@@ -17,6 +17,14 @@ export class User extends Document {
 
   @Prop()
   specialty: string;
+
+  @Prop({ type: [{ 
+  title: String, 
+  description: String, 
+  avaliableSlots: Number, 
+  enrolledStudents: [String] 
+  }], default: [] })
+  topics: any[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

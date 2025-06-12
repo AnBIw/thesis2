@@ -1,0 +1,14 @@
+.search-bar {
+  width: 90%;
+  margin-bottom: -18px;
+}
+.document-list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.mat-column-authors {
+  min-width: 220px;
+  width: 30%;
+  white-space: normal;
+}

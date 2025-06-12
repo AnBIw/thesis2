@@ -7,8 +7,8 @@ export class ThesisTopicsController {
   constructor(private readonly thesisTopicsService: ThesisTopicsService) {}
 
   @Post()
-  create(@Body() topic: ThesisTopic): ThesisTopic {
-    return this.thesisTopicsService.create(topic);
+  async create(@Body() topic: ThesisTopic): Promise<ThesisTopic> {
+    return await this.thesisTopicsService.create(topic);
   }
 
   @Get()

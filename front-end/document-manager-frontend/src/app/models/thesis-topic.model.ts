@@ -4,7 +4,7 @@ export interface ThesisTopic {
     description: string;
     professor: string;
     avaliableSlots: number;
-    students: string[];
+    enrolledStudents: students[];
 }
 
 export interface students {

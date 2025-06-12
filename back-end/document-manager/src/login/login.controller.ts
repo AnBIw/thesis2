@@ -30,5 +30,18 @@ export class LoginController {
       name: professor.name,
       specialty: professor.specialty,
     }));
-}
+  }
+
+  @Get('temas')
+  async getThesisTopics() {
+    const topics = await this.LoginService.getThesisTopics();
+    const profesor = await this.LoginService.findProfessor();
+    return topics.map(topic => ({
+      title: topic.title,
+      description: topic.description,
+      avaliableSlots: topic.avaliableSlots,
+      enrolledStudents: topic.enrolledStudents,
+      professor : profesor.find(prof => prof.topics.some(t => t.title === topic.title))?.name || 'Unknown',
+    }));
+  }
 }
