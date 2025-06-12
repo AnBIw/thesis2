@@ -28,15 +28,15 @@ export class ThesisService {
         return this.http.post<ThesisTopic>(this.url1, thesisTopic);
     }
 
-    deleteThesisTopic(id: string): Observable<ThesisTopic> {
-        return this.http.delete<ThesisTopic>(`${this.url1}/${id}`);
+    deleteThesisTopic(tittle: string): Observable<ThesisTopic> {
+        return this.http.delete<ThesisTopic>(`${this.url1}/${tittle}`);
     }
 
     updateThesisTopic(thesisTopic: ThesisTopic): Observable<ThesisTopic> {
         return this.http.put<ThesisTopic>(`${this.url1}/${thesisTopic.id}`, thesisTopic);
     }
 
-    enrollStudent(topicId: string, email: string): Observable<void> {
-        return this.http.post<void>(`${this.url1}/${topicId}/enroll`, { email });
+    enrollStudent(tittle: string, name: string, email: string): Observable<void> {
+        return this.http.post<void>(`${this.url1}/${tittle}/enroll`, { name, email });
       }
 }

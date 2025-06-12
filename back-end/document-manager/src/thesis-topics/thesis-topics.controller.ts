@@ -17,14 +17,16 @@ export class ThesisTopicsController {
   }
 
   @Delete(':id')
-  delete(@Param('id') id: string): void {
-    this.thesisTopicsService.delete(id);
+  delete(@Param('id') tittle: string): void {
+    console.log(`Deleting thesis topic with id: ${tittle}`);
+    this.thesisTopicsService.delete(tittle);
   }
   @Post(':id/enroll')
   async enrollStudent(
   @Param('id') id: string,
   @Body('email') email: string,
+  @Body('name') name: string,
   ): Promise<void> {
-  await this.thesisTopicsService.enrollStudent(id, email);
+  await this.thesisTopicsService.enrollStudent(id, email, name);
 }
 }

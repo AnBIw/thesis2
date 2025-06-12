@@ -80,8 +80,8 @@ export class TopicListComponent implements OnInit {
     return this.thesisTopics.filter((topic) => topic.professor === professorName);
   }
 
-  deleteTopic(id: string): void {
-  this.thesisService.deleteThesisTopic(id).subscribe({
+  deleteTopic(tittle : string): void {
+  this.thesisService.deleteThesisTopic(tittle).subscribe({
     next: () => {
       this.loadThesisTopics();
     },
@@ -91,14 +91,14 @@ export class TopicListComponent implements OnInit {
     });
   }
 
-  enrollStudent(topicId: string): void {
-    const studentEmail = localStorage.getItem('email') || ''; // Obtén el nombre del estudiante desde localStorage
-    if (!studentEmail) {
-      console.error('No se encontró el nombre del estudiante en localStorage');
-      return;
-    }
-  
-    this.thesisService.enrollStudent(topicId, studentEmail).subscribe({
+  enrollStudent(tittle: string): void {
+    const studentEmail = localStorage.getItem('email') || ''; // Obtén el email del estudiante desde localStorage
+    const name = localStorage.getItem('name') || ''; // Obtén el nombre del estudiante desde localStorage
+    
+    console.log('Inscribiendo al estudiante:', name, ', \tcon email:', studentEmail);
+    console.log('tema a enrolarse:', tittle);
+
+    this.thesisService.enrollStudent(tittle, name, studentEmail).subscribe({
       next: () => {
         console.log('Estudiante inscrito correctamente');
         this.loadThesisTopics(); // Recargar la lista de temas
