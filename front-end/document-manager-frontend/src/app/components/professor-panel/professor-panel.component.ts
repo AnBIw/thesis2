@@ -27,4 +27,6 @@ import { TopicListComponent } from '../topic-list/topic-list.component';
   templateUrl: './professor-panel.component.html',
   styleUrls: ['./professor-panel.component.css'],
 })
-export class ProfessorPanelComponent {}
+export class ProfessorPanelComponent {
+  professorName: string = localStorage.getItem('name') || '';
+}

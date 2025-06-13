@@ -1,16 +1,64 @@
 table {
+  
     width: 100%;
+    margin-bottom: 8px;
   }
   
   .mat-header-cell, .mat-cell {
     text-align: left;
-    padding: 8px;
+    
   }
   
   .mat-header-row {
-    background-color: #f5f5f5;
+    background-color: rgba(255, 255, 255, 0.7); /* Blanco con 25% opacidad */
+
   }
   
   .mat-elevation-z8 {
     box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
   }
+
+.professor-card {
+  
+  margin-bottom: 0;
+  background-color: #679e7c;
+}
+
+mat-card-header {
+  margin-bottom: 0;
+  padding-bottom: 8px;
+  
+}
+
+mat-card-content > .professor-card {
+  margin-bottom: 0;
+  background-color: rgba(255, 255, 255, 0.2); /* Blanco con 25% opacidad */
+
+}
+
+mat-card-content table {
+   background-color: rgba(255, 255, 255, 0.2); /* Blanco con 25% opacidad */
+
+  margin-top: 0;
+}
+
+.student-entry {
+  
+  margin-bottom: 2px;
+  line-height: 1.2;
+  padding: 2px 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.student-name {
+  font-weight: bold;
+  font-size: 0.97em;
+  line-height: 1.1;
+}
+
+.student-email {
+  font-size: 0.93em;
+  color: #4a6947;
+  line-height: 1.1;
+}

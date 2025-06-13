@@ -1,5 +1,9 @@
 <div class="contenedor">
-    <h2>Iniciar Sesión</h2>
+    <h2>Inicio de Sesión</h2>
+    <p class="login-info">
+    Si eres <b>alumno</b> puedes inscribirte en temas.<br><br>
+    Si eres <b>profesor</b> puedes publicar temas y modificar tesis.
+    </p>
     <form (ngSubmit)="onSubmit()">
         <input type="email" [(ngModel)]="email" name="email" placeholder="Email" required />
         <input type="password" [(ngModel)]="password" name="password" placeholder="Contraseña" required />

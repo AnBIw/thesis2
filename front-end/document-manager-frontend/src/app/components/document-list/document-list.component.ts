@@ -68,6 +68,7 @@ export class DocumentListComponent implements OnInit {
   }
 
   previewDocument(id: string): void {
+    console.log('Previewing document with ID:', id);
     this.documentService.previewDocument(id).subscribe({
       next: (blob) => {
         const fileURL = URL.createObjectURL(blob);
@@ -93,6 +94,12 @@ export class DocumentListComponent implements OnInit {
       },
     });
   }
+
+  confirmDelete(id: string): void {
+  if (window.confirm('¿Estás seguro de que deseas eliminar este documento?')) {
+    this.deleteDocument(id);
+  }
+}
 
   deleteDocument(id: string): void {
     this.documentService.deleteDocument(id).subscribe({

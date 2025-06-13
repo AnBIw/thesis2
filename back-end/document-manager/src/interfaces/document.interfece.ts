@@ -5,4 +5,7 @@ export interface Document {
   size: number;
   description: String,
   createdAt: Date;
+  age: number;
+  authors: string[];
+  status: string;
 }

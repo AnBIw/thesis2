@@ -1,0 +1,36 @@
+.add-topic-form {
+  max-width: 600px;
+  margin: 0 auto; /* Centra horizontalmente */
+  margin-bottom: 8px;
+}
+
+.form-title {
+  text-align: center;
+  color: #1a237e;
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.topic-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.button-row {
+  display: flex;
+  justify-content: center;
+}
+.professor-greeting {
+  flex: 1;
+  text-align: center;
+  color: #1a237e;
+  font-weight: bold;
+  font-size: 2rem;
+  margin-top: 4px;
+  margin-bottom: 8px;
+}

@@ -26,6 +26,9 @@ export class LoginComponent {
     this.authService.login(this.email, this.password, this.name);
     // Optional: Add response handling
     this.respuesta = 'Login en proceso...';
+    if(this.email === '' || this.password === '' || this.name === '') {
+      this.respuesta = 'Por favor, completa todos los campos.';
+    }
   }
 
 }

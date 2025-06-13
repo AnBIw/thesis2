@@ -24,5 +24,5 @@ import { MatFormFieldModule } from '@angular/material/form-field';
   styleUrl: './student-panel.component.css'
 })
 export class StudentPanelComponent {
-
+  StudentName: string = localStorage.getItem('name') || ''; // O el nombre real del estudiante
 }

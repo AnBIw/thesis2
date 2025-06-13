@@ -1,0 +1,21 @@
+.upload-card {
+  max-width: 800px;
+  margin: 0 auto ;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
+
+.upload-form {
+  gap: 18px;
+}
+
+.file-input {
+  margin-bottom: 10px;
+}
+
+.full-width {
+  width: 100%;
+}
+mat-card-title {
+  color: #1a237e;
+  font-weight: bold;
+}

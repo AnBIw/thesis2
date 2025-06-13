@@ -25,8 +25,12 @@ import { DocumentService } from '../../services/document.service';
 export class UploadDocumentComponent {
   file: File | null = null;
   description: string = '';
+  title: string = '';
+  author: string = '';
+  date: string = '';
+  status: string = '';
 
-  @Output() documentUploaded = new EventEmitter<void>(); // Emitir evento después de subir un documento
+  @Output() documentUploaded = new EventEmitter<void>();
 
   constructor(private documentService: DocumentService) {}
 
@@ -36,11 +40,14 @@ export class UploadDocumentComponent {
 
   uploadDocument(): void {
     if (this.file) {
-      this.documentService.uploadDocument(this.file, this.description).subscribe({
+      this.documentService.uploadDocument(
+        this.file,
+        this.description,
+      ).subscribe({
         next: (response) => {
           console.log('Document uploaded successfully', response);
           alert('Document uploaded successfully');
-          this.documentUploaded.emit(); // Emitir evento para recargar la lista
+          this.documentUploaded.emit();
         },
         error: (error) => {
           console.error('Error uploading document', error);

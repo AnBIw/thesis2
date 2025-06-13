@@ -81,5 +81,5 @@ async enrollStudent(title: string, email: string, name: string): Promise<void> {
     }
   }
   console.log('Estudiante inscrito correctamente:', email);
-}
+  }
 }

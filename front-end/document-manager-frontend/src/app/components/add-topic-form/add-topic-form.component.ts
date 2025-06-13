@@ -28,7 +28,12 @@ import { LoginComponent } from '../login/login.component';
   styleUrls: ['./add-topic-form.component.css'],
 })
 export class AddTopicFormComponent {
-  //@Output() topicAdded = new EventEmitter<void>(); // Evento para notificar que se agregó un tema
+  isMinimized = false;
+
+  toggleMinimize() {
+    this.isMinimized = !this.isMinimized;
+  }
+  professorName: string = localStorage.getItem('name') || ''; // Obtiene el nombre del profesor desde el localStorage
   thesisTopics: ThesisTopic[] = [];
   newTopic: ThesisTopic = {
     id: '',

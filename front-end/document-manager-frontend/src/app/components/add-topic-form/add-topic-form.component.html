@@ -1,23 +1,34 @@
-<div class="contenedor">
+<div class="contenedor add-topic-form">
+  <div style="display: flex; align-items: center; justify-content: space-between;">
+    <h2 class="professor-greeting">¡Hola, {{ professorName }}!</h2>
+    <button mat-icon-button (click)="toggleMinimize()" aria-label="Minimizar formulario">
+      <mat-icon>{{ isMinimized ? 'expand_more' : 'expand_less' }}</mat-icon>
+      <span style="font-size: 10px;">
+      </span>
+    </button>
   </div>
-  <mat-card>
+  <mat-card *ngIf="!isMinimized">
     <mat-card-content>
-      <!-- Formulario para agregar temas -->
-      <h3>Agregar Nuevo Tema de Tesis</h3>
-      <form (ngSubmit)="addTopic()">
-        <mat-form-field appearance="fill">
+      <h3 class="form-title">Agregar Nuevo Tema de Tesis</h3>
+      <form #topicForm="ngForm" (ngSubmit)="addTopic()" class="topic-form">
+        <mat-form-field appearance="outline" class="full-width">
           <mat-label>Título del Tema</mat-label>
           <input matInput [(ngModel)]="newTopic.title" name="title" required />
         </mat-form-field>
-        <mat-form-field appearance="fill">
+        <mat-form-field appearance="outline" class="full-width">
           <mat-label>Descripción</mat-label>
-          <input matInput [(ngModel)]="newTopic.description" name="description" required />
+          <textarea matInput rows="3" [(ngModel)]="newTopic.description" name="description" required></textarea>
         </mat-form-field>
-        <mat-form-field appearance="fill">
+        <mat-form-field appearance="outline" class="full-width">
           <mat-label>Cupos Disponibles</mat-label>
-          <input matInput type="number" [(ngModel)]="newTopic.avaliableSlots" name="avaliableSlots" required />
+          <input matInput type="number" min="1" [(ngModel)]="newTopic.avaliableSlots" name="avaliableSlots" required />
         </mat-form-field>
-        <button mat-raised-button color="primary" type="submit">Agregar Tema</button>
+        <div class="button-row">
+          <button mat-raised-button color="primary" type="submit" [disabled]="!topicForm.form.valid">
+            Agregar Tema
+          </button>
+        </div>
       </form>
     </mat-card-content>
   </mat-card>
+</div>
