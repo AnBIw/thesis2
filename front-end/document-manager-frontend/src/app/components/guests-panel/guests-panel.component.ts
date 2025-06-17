@@ -12,8 +12,7 @@ import { MatCard } from '@angular/material/card';
 @Component({
   selector: 'app-guests-panel',
   imports: [
-    DocumentListComponent,    // Importa el subcomponente de la lista
-    TopicListComponent,
+    DocumentListComponent,
     CommonModule,
     FormsModule,
     MatCardModule,
