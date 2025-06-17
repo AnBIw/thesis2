@@ -17,14 +17,17 @@ export class AuthService {
         localStorage.setItem('userRole', response.user.role);  // Guarda el rol
         localStorage.setItem('name', response.user.name); // Guarda el nombre del profesor
         localStorage.setItem('email', response.user.email); // Guarda el email en localStorage
-        console.log('Redirigiendo a:', response.user.role);
-        console.log('Respuesta del servidor:', response);
         this.redirectBasedOnRole(response.user.role);
       },
       error: (error) => {
         alert('Credenciales incorrectas');
       }
     });
+  }
+  logingest(){
+    localStorage.setItem('userRole', 'guest');  // Guarda el rol de invitado
+    localStorage.setItem('name', 'Guest'); // Guarda el nombre de invitado
+    this.router.navigate(['/guest']);
   }
 
   private redirectBasedOnRole(role: string) {

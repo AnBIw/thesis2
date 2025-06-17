@@ -4,6 +4,7 @@ import { ProfessorPanelComponent } from './components/professor-panel/professor-
 import { AlumnoGuard } from './guards/alumno.guard';
 import { ProfesorGuard } from './guards/professor.guard';
 import { StudentPanelComponent } from './components/student-panel/student-panel.component';
+import { GuestsPanelComponent } from './components/guests-panel/guests-panel.component';
 
 export const routes: Routes = [
     { path: 'login', component: LoginComponent },
@@ -17,7 +18,10 @@ export const routes: Routes = [
       component: StudentPanelComponent,
       canActivate: [AlumnoGuard]  // Solo accesible si está autenticado como alumno
     },
-
+    {
+      path: 'guest',
+      component: GuestsPanelComponent // Nueva ruta para invitados
+    },
     { path: '', redirectTo: '/login', pathMatch: 'full' },  // Ruta por defecto -> login
     { path: '**', redirectTo: '/login' }  // Ruta desconocida -> login
   ];

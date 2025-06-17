@@ -30,5 +30,8 @@ export class LoginComponent {
       this.respuesta = 'Por favor, completa todos los campos.';
     }
   }
+    loginGuest() {
+    this.authService.logingest();
+  }
 
 }

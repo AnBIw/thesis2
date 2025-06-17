@@ -66,3 +66,21 @@ button[type="submit"]:hover {
   margin-bottom: 18px;
   text-align: center;
 }
+
+button.guest-btn {
+  background: #e28787;         
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 0;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+  width: 100%;
+  margin-top: 10px;
+}
+
+button.guest-btn:hover {
+  background: #d65555;        
+}

@@ -3,9 +3,10 @@ export interface Document {
   path: string;
   mimetype: string;
   size: number;
-  description: String,
   createdAt: Date;
-  age: number;
+  title: string;
   authors: string[];
+  age: number;
   status: string;
+  description: string;
 }

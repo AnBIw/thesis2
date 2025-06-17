@@ -10,10 +10,25 @@ export class DocumentService {
 
   constructor(private http: HttpClient) {}
 
-  uploadDocument(file: File, description: string): Observable<any> {
+  uploadDocument(
+    file: File,
+    title: string,
+    authors: string,
+    age: string,
+    status: string,
+    description: string,
+
+  ): Observable<any> {
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('description', description);
+    formData.append('filename', file.name);
+    formData.append('mimetype', file.type);
+    formData.append('title', title);
+    formData.append('authors', authors);
+    formData.append('age', age); 
+    formData.append('status', status); 
+    formData.append('description', description)
+
     return this.http.post(`${this.apiUrl}/upload`, formData);
   }
 

@@ -33,12 +33,13 @@ export class DocumentListComponent implements OnInit {
   documents: any[] = []; // Lista completa de documentos
   filteredDocuments: any[] = []; // Lista filtrada de documentos
   searchControl = new FormControl(''); // Control del campo de búsqueda
-
+  userRole: string = ""
 
   constructor(private documentService: DocumentService) {}
 
   ngOnInit(): void {
     this.loadDocuments();
+    this.userRole = localStorage.getItem('userRole') || ''; // Obtener el rol del usuario desde el almacenamiento locals
 
     // Escuchar cambios en el campo de búsqueda
     this.searchControl.valueChanges
@@ -120,8 +121,12 @@ export class DocumentListComponent implements OnInit {
     }
     // Filtrar documentos por coincidencia en el nombre del archivo
     this.filteredDocuments = this.documents.filter((document) =>
-      document.filename.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+      document.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      document.authors.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      document.age.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      document.status.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      document.description.toLowerCase().includes(searchTerm.toLowerCase())  
+  );
   }
-  
+
 }

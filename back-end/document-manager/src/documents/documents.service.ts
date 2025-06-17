@@ -38,6 +38,10 @@ export class DocumentsService {
         size: oldDocument.size,
         description: oldDocument.description,
         createdAt: oldDocument.createdAt,
+        title: oldDocument.title,
+        age: oldDocument.age,
+        authors: oldDocument.authors,
+        status: oldDocument.status,
       });
       await removedDocument.save();
 
@@ -49,6 +53,9 @@ export class DocumentsService {
       oldDocument.path = newFile.path;
       oldDocument.mimetype = newFile.mimetype;
       oldDocument.size = newFile.size;
+      oldDocument.age = newFile.age; // Actualizar el año
+      oldDocument.authors = newFile.authors; // Actualizar los autores
+      oldDocument.status = newFile.status; // Actualizar el estado
     }
 
     // Actualizar la descripción

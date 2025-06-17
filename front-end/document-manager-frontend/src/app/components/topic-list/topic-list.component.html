@@ -18,7 +18,7 @@
         </mat-card>
 
         <!-- Tabla de Temas de Tesis -->
-        <table mat-table [dataSource]="getTopicsByProfessor(professor.name)" class="mat-elevation-z8">
+        <table mat-table [dataSource]="getTopicsByProfessor(professor.name)" class="mat-elevation-z8 thesis-table">
           <!-- Título Column -->
           <ng-container matColumnDef="title">
             <th mat-header-cell *matHeaderCellDef> Título </th>
@@ -41,11 +41,12 @@
           <ng-container matColumnDef="enrollStudent">
             <th mat-header-cell *matHeaderCellDef> Estudiantes Inscritos</th>
             <td mat-cell *matCellDef="let topic">
-            <ng-container *ngFor="let student of topic.enrolledStudents">
-              <div style>
+            <ng-container *ngFor="let student of topic.enrolledStudents; let last = last">
+              <div class="student-entry">
                 <span class="student-name">{{ student.split(',')[1] }}</span>
                 <span class="student-email">{{ student.split(',')[0] }}</span>
               </div>
+              <div *ngIf="!last" class="student-separator">---</div>
             </ng-container>
           </td>
           </ng-container>

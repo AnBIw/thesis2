@@ -5,6 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { DocumentService } from '../../services/document.service';
+import { MatIcon } from '@angular/material/icon';
 
 @Component({
   selector: 'app-upload-document',
@@ -16,6 +17,7 @@ import { DocumentService } from '../../services/document.service';
     MatButtonModule,
     MatInputModule,
     MatFormFieldModule,
+    MatIcon
   ],
   templateUrl: './upload-document.component.html',
   styleUrls: ['./upload-document.component.css'],
@@ -24,28 +26,37 @@ import { DocumentService } from '../../services/document.service';
 
 export class UploadDocumentComponent {
   file: File | null = null;
-  description: string = '';
   title: string = '';
-  author: string = '';
-  date: string = '';
+  authors: string = '';
+  age: string = '';
   status: string = '';
+  description: string = '';
+    isMinimized = false;
 
   @Output() documentUploaded = new EventEmitter<void>();
 
   constructor(private documentService: DocumentService) {}
 
   onFileChange(event: any): void {
+    //carga el archivo seleccionado
     this.file = event.target.files[0];
+  }
+  //cambia el estado de minimizado
+  toggleMinimize() {
+    this.isMinimized = !this.isMinimized;
   }
 
   uploadDocument(): void {
     if (this.file) {
       this.documentService.uploadDocument(
         this.file,
-        this.description,
+        this.title,
+        this.authors,
+        this.age,
+        this.status,
+        this.description
       ).subscribe({
         next: (response) => {
-          console.log('Document uploaded successfully', response);
           alert('Document uploaded successfully');
           this.documentUploaded.emit();
         },

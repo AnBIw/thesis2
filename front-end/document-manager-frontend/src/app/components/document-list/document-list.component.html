@@ -20,7 +20,7 @@
         <ng-container matColumnDef="title">
           <th mat-header-cell *matHeaderCellDef> Título </th>
           <td mat-cell *matCellDef="let doc">
-            <span class="doc-title-cell">{{ doc.title || doc.filename }}</span>
+            <span class="doc-title-cell">{{ doc.title }}</span>
           </td>
         </ng-container>
 
@@ -33,7 +33,7 @@
         <!-- Fecha Column -->
         <ng-container matColumnDef="date">
           <th mat-header-cell *matHeaderCellDef> Año </th>
-          <td mat-cell *matCellDef="let doc"> {{ doc.date }} </td>
+          <td mat-cell *matCellDef="let doc"> {{ doc.age }} </td>
         </ng-container>
 
         <!-- Estado Column -->
@@ -54,7 +54,8 @@
             <button mat-icon-button color="accent" (click)="downloadDocument(doc._id, doc.filename)" matTooltip="Descargar">
               <mat-icon>download</mat-icon>
             </button>
-            <button mat-icon-button color="warn" (click)="confirmDelete(doc._id)" matTooltip="Eliminar">
+            <button mat-icon-button color="warn" (click)="confirmDelete(doc._id)" matTooltip="Eliminar" 
+              *ngIf="userRole === 'professor' || userRole === 'admin'">
               <mat-icon>delete</mat-icon>
             </button>
           </td>

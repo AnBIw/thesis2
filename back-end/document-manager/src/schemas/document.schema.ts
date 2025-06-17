@@ -7,6 +7,10 @@ export const DocumentSchema = new Schema({
   path: String,
   mimetype: String,
   size: Number,
+  title: String,
+  authors: String,
+  age: String,
+  status: String,
   description: String,
   createdAt: { type: Date, default: Date.now },
 });
@@ -18,8 +22,12 @@ export interface Document extends MongooseDocument {
   path: string;
   mimetype: string;
   size: number;
-  description: String,
   createdAt: Date;
+  title: string;
+  authors: string;
+  age: string;
+  status: string;
+  description: string;
 }
 
 
