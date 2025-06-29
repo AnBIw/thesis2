@@ -27,6 +27,13 @@ export class ThesisTopicsController {
   @Body('email') email: string,
   @Body('name') name: string,
   ): Promise<void> {
-  await this.thesisTopicsService.enrollStudent(id, email, name);
+  await this.thesisTopicsService.enrollStudent(id, email);
+  }
+  @Post(':id/unroll')
+  async unsubscribeStudent(
+    @Param('id') id: string,
+    @Body('email') email: string,
+  ): Promise<void> {
+    await this.thesisTopicsService.unsubscribeStudent(id, email);
 }
 }

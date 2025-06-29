@@ -10,6 +10,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { ThesisService } from '../../services/thesis.service';
 import { ThesisTopic } from '../../models/thesis-topic.model';
 import { MatTableModule } from '@angular/material/table'; // Importa MatTableModule
+import { MatSnackBar } from '@angular/material/snack-bar'; // Importa MatSnackBar para mostrar mensajes
 
 @Component({
   selector: 'topic-list',
@@ -34,7 +35,11 @@ export class TopicListComponent implements OnInit {
   displayedColumns: string[] = ['title', 'description', 'avaliableSlots', 'enrolledStudents'];
   userRole: string = localStorage.getItem('userRole') || '';
 
-  constructor(private thesisService: ThesisService) {}
+  constructor(
+    private thesisService: ThesisService,
+    private snackBar: MatSnackBar // Agrega esto
+
+  ) {}
 
   ngOnInit(): void {
     this.loadThesisTopics();
@@ -91,21 +96,43 @@ export class TopicListComponent implements OnInit {
     });
   }
 
-  enrollStudent(tittle: string): void {
-    const studentEmail = localStorage.getItem('email') || ''; // Obtén el email del estudiante desde localStorage
-    const name = localStorage.getItem('name') || ''; // Obtén el nombre del estudiante desde localStorage
-    
-    console.log('Inscribiendo al estudiante:', name, ', \tcon email:', studentEmail);
-    console.log('tema a enrolarse:', tittle);
+  enrollStudent(title: string): void {
+    const studentEmail = localStorage.getItem('email') || '';
+    // Cuenta los temas donde el estudiante está inscrito
+    const inscripciones = this.thesisTopics.filter(topic =>
+      topic.enrolledStudents?.some((s: any) => typeof s === 'string' && s.split(',')[0] === studentEmail)
+    ).length;
 
-    this.thesisService.enrollStudent(tittle, name, studentEmail).subscribe({
+    if (inscripciones >= 2) {
+      this.snackBar.open('Solo puedes inscribirte en 2 temas como máximo.', 'Cerrar', { duration: 3000 });
+      return;
+    }
+
+    this.thesisService.enrollStudent(title, studentEmail).subscribe({
       next: () => {
-        console.log('Estudiante inscrito correctamente');
-        this.loadThesisTopics(); // Recargar la lista de temas
+        this.loadThesisTopics();
+        this.snackBar.open('Estudiante inscrito correctamente', 'Cerrar', { duration: 2000 });
       },
       error: (error) => {
         console.error('Error al inscribir al estudiante', error);
       },
     });
+}
+  unsubscribeStudent(title: string): void {
+    if (confirm('¿Estás seguro que deseas desuscribirte de este tema?')) {
+    const studentEmail = localStorage.getItem('email') || '';
+    this.thesisService.unsubscribeStudent(title, studentEmail).subscribe({
+      next: () => {
+        this.loadThesisTopics();
+        this.snackBar.open('Estudiante desinscrito correctamente', 'Cerrar', {
+          duration: 2000,
+        });
+      },
+      error: (error) => {
+        console.error('Error al desuscribir al estudiante', error);
+      },
+    });
   }
+  }
+  
 }

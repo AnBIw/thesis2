@@ -27,23 +27,18 @@ export class LoginService {
     });
   }
 
-  create(createLoginDto: CreateLoginDto) {
-    return 'This action adds a new login';
+  async getStudents(): Promise<User[]> {
+    return this.userModel.find({ role: 'students' }).exec();
   }
 
-  findAll() {
-    return `This action returns all login`;
+  async findByEmail(email: string) {
+    return this.userModel.findOne({ email }); // Ajusta según tu ORM
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} login`;
+  async createUser(data: { email: string; password: string; name: string; role: string }) {
+    // Aquí deberías hashear la contraseña antes de guardar
+    const newUser = new this.userModel(data);
+    return newUser.save();
   }
 
-  update(id: number, updateLoginDto: UpdateLoginDto) {
-    return `This action updates a #${id} login`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} login`;
-  }
 }

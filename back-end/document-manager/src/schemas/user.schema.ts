@@ -9,11 +9,11 @@ export class User extends Document {
   @Prop({ required: true })
   password: string;
 
-  @Prop({ required: true, enum: ['student', 'professor'] })
-  role: string;
-
   @Prop()
   name: string;
+
+  @Prop({ required: true, enum: ['students', 'professor'] })
+  role: string;
 
   @Prop()
   specialty: string;

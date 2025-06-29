@@ -36,7 +36,10 @@ export class AuthService {
     } else if (role === 'professor') {
       this.router.navigate(['/professor']);
     }
+    else if (role === 'admin') {
+      this.router.navigate(['/admin']);
   }
+}
 
   logout() {
     localStorage.removeItem('userRole');

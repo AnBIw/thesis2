@@ -36,7 +36,10 @@ export class ThesisService {
         return this.http.put<ThesisTopic>(`${this.url1}/${thesisTopic.id}`, thesisTopic);
     }
 
-    enrollStudent(tittle: string, name: string, email: string): Observable<void> {
-        return this.http.post<void>(`${this.url1}/${tittle}/enroll`, { name, email });
+    enrollStudent(tittle: string, email: string): Observable<void> {
+        return this.http.post<void>(`${this.url1}/${tittle}/enroll`, {  email });
       }
+    unsubscribeStudent(tittle: string, email: string) {
+        return this.http.post<void>(`${this.url1}/${tittle}/unroll`, { name, email });
+    }
 }

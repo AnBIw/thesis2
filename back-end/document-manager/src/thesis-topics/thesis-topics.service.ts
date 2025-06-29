@@ -52,20 +52,7 @@ async delete(title: string): Promise<void> {
     }
   }
 }
-async enrollStudent(title: string, email: string, name: string): Promise<void> {
-  // 1. Actualiza en memoria (opcional)
-  // const topic = this.thesisTopics.find((topic) => topic.title === title);
-  // if (topic) {
-  //   if (topic.enrolledStudents.includes(email)) {
-  //     throw new BadRequestException('El estudiante ya está inscrito en este tema');
-  //   }
-  //   // if (topic.avaliableSlots <= 0) {
-  //   //   throw new BadRequestException('No hay cupos disponibles para este tema');
-  //   // }
-  //   topic.enrolledStudents.push(email, name);
-  // }
-
-  // 2. Actualiza en la base de datos (en el profesor)
+async enrollStudent(title: string, email: string): Promise<void> {
   const users = await this.userModel.find();
   for (const user of users) {
     const userTopic = user.topics.find((t: any) => t.title === title);
@@ -76,10 +63,26 @@ async enrollStudent(title: string, email: string, name: string): Promise<void> {
       //if (userTopic.avaliableSlots <= 0) {
       //  throw new BadRequestException('No hay cupos disponibles para este tema');
       //}
-      userTopic.enrolledStudents.push(email, name);
+      userTopic.enrolledStudents.push(email);
       await user.save();
     }
   }
   console.log('Estudiante inscrito correctamente:', email);
+  }
+async unsubscribeStudent(title: string, email: string): Promise<void> {
+  const users = await this.userModel.find();
+  for (const user of users) {
+    const userTopic = user.topics.find((t: any) => t.title === title);
+    if (userTopic) {
+      const index = userTopic.enrolledStudents.indexOf(email);
+      if (index !== -1) {
+        userTopic.enrolledStudents.splice(index, 1);
+        await user.save();
+        console.log('Estudiante desuscrito correctamente:', email);
+      } else {
+        throw new BadRequestException('El estudiante no está inscrito en este tema');
+      }
+    }
+  }
   }
 }

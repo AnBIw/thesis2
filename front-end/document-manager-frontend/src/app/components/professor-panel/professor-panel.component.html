@@ -1,6 +1,6 @@
 <div class="container" style="display: flex; justify-content: space-between; gap: 20px;">
   <!-- Tarjeta para agregar temas -->
-  <mat-card class="column" style="flex: 1;">
+  <mat-card class="column" style="flex: 1; overflow-y: auto; max-height: 85vh;">
     <mat-card-content>
       <add-topic-form></add-topic-form>
       <topic-list></topic-list>
@@ -8,7 +8,7 @@
   </mat-card>
 
   <!-- Tarjeta para subir documentos y listar documentos -->
-  <mat-card class="column" style="flex: 1;">
+  <mat-card class="column" style="flex: 1; overflow-y: auto; max-height: 85vh;">
     <mat-card-content>
       <app-upload-document></app-upload-document>
       <app-document-list></app-document-list>

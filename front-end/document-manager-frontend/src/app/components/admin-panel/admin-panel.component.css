@@ -1,0 +1,17 @@
+mat-card {
+    margin: 0 auto; 
+    max-width: 1200px;
+    padding: 4px
+}
+
+.container {
+  display: flex;
+  justify-content: center;   /* Centra horizontalmente */
+  gap: 10px;                 /* Espacio entre columnas, opcional */
+  padding: 2px;
+}
+.column {
+  flex: 1;
+}
+
+

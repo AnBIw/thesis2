@@ -31,21 +31,20 @@
             <td mat-cell *matCellDef="let topic"> {{ topic.description }} </td>
           </ng-container>
 
-          <!-- Cupos Column -->
+          <!-- CUpos Column -->
           <ng-container matColumnDef="avaliableSlots">
             <th mat-header-cell *matHeaderCellDef> Cupos </th>
             <td mat-cell *matCellDef="let topic"> {{ topic.avaliableSlots }} </td>
           </ng-container>
 
-          <!-- Cupos Column -->
+          <!-- Inscritos Column -->
           <ng-container matColumnDef="enrollStudent">
             <th mat-header-cell *matHeaderCellDef> Estudiantes Inscritos</th>
             <td mat-cell *matCellDef="let topic">
-            <ng-container *ngFor="let student of topic.enrolledStudents; let last = last">
-              <div class="student-entry">
-                <span class="student-name">{{ student.split(',')[1] }}</span>
-                <span class="student-email">{{ student.split(',')[0] }}</span>
-              </div>
+              <ng-container *ngFor="let student of topic.enrolledStudents; let last = last">
+                <div class="student-entry">
+                  <span class="student-email">{{ student.split(',')[0] }}</span>
+                </div>
               <div *ngIf="!last" class="student-separator">---</div>
             </ng-container>
           </td>
@@ -57,7 +56,7 @@
             <td mat-cell *matCellDef="let topic">
               <button 
                 mat-icon-button
-                *ngIf="userRole === 'professor'"
+                *ngIf="userRole === 'professor' || userRole === 'admin'"
                 (click)="deleteTopic(topic.title)">
                 <mat-icon>delete</mat-icon>
               </button>
@@ -66,6 +65,12 @@
               *ngIf="userRole === 'students'"
               (click)="enrollStudent(topic.title)">
               <mat-icon>person_add</mat-icon>
+              </button>
+              <button
+              mat-icon-button
+              *ngIf="userRole === 'students'"
+              (click)="unsubscribeStudent(topic.title)">
+                <mat-icon>person_remove</mat-icon>
               </button>
               </td>
           </ng-container>
