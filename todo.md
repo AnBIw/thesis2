@@ -17,8 +17,8 @@
 
     PENDIENTES
 [x] nombre de profesores al lado de autores
-[] mostrar numeros de inscritos en el tema
-[] que un estudiante vea donde esta inscrito con colores
+[x] mostrar numeros de inscritos en el tema
+[x] que un estudiante vea donde esta inscrito con colores
 [x] crear un portal de creacion de usuarios
 [x] crear admin
 [] crear continuidad de solicitudes de temas de tesis
@@ -26,8 +26,10 @@
     - [] mostrar seleccionados o preseleccion
     - [] boton que redirija a outlook o gmail
 
-[] limpiar codigo y comentar de forma idonea
-[] filtros de biblioteca
+[x] limpiar codigo y comentar de forma idonea
+[x] filtros de biblioteca
+    - [x] ordenar alfabeticamente
+    - [x] ordenar fecha
 [x] crear usuarios desde el backendW
 [x] crear usuarios desde el frontend
 [x] ajustar el scroll de invitado

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';import { CommonModule } from '@angular/common';
+import { Component, EventEmitter, Output } from '@angular/core'; import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -31,11 +31,11 @@ export class UploadDocumentComponent {
   age: string = '';
   status: string = '';
   description: string = '';
-    isMinimized = false;
+  isMinimized = false;
 
   @Output() documentUploaded = new EventEmitter<void>();
 
-  constructor(private documentService: DocumentService) {}
+  constructor(private documentService: DocumentService) { }
 
   onFileChange(event: any): void {
     //carga el archivo seleccionado

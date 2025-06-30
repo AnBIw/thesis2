@@ -9,12 +9,12 @@ import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
 import { ThesisService } from '../../services/thesis.service';
 import { ThesisTopic } from '../../models/thesis-topic.model';
-import { MatTableModule } from '@angular/material/table'; // Importa MatTableModule
-import { MatSnackBar } from '@angular/material/snack-bar'; // Importa MatSnackBar para mostrar mensajes
+import { MatTableModule } from '@angular/material/table'; 
+import { MatSnackBar } from '@angular/material/snack-bar'; 
 
 @Component({
   selector: 'topic-list',
-  standalone: true, 
+  standalone: true,
   imports: [
     CommonModule,
     FormsModule,
@@ -34,19 +34,19 @@ export class TopicListComponent implements OnInit {
   professors: { name: string; specialty: string }[] = [];
   displayedColumns: string[] = ['title', 'description', 'avaliableSlots', 'enrolledStudents'];
   userRole: string = localStorage.getItem('userRole') || '';
+  email: string = localStorage.getItem('email') || ''; 
 
   constructor(
     private thesisService: ThesisService,
-    private snackBar: MatSnackBar // Agrega esto
-
-  ) {}
+    private snackBar: MatSnackBar 
+  ) { }
 
   ngOnInit(): void {
     this.loadThesisTopics();
     this.getProfessors();
     this.getThesisTopics();
   }
-
+  //cargo los temas de tesis
   loadThesisTopics(): void {
     this.thesisService.getThesisTopics().subscribe({
       next: (response) => {
@@ -73,29 +73,25 @@ export class TopicListComponent implements OnInit {
     this.thesisService.getThesisTopics().subscribe(
       (topics) => {
         this.thesisTopics = topics;
-        //console.log('Thesis topics loaded:', this.thesisTopics);
       },
       (error) => {
         console.error('Error fetching thesis topics:', error);
       }
     );
   }
-
   getTopicsByProfessor(professorName: string): ThesisTopic[] {
     return this.thesisTopics.filter((topic) => topic.professor === professorName);
   }
-
-  deleteTopic(tittle : string): void {
-  this.thesisService.deleteThesisTopic(tittle).subscribe({
-    next: () => {
-      this.loadThesisTopics();
-    },
-    error: (error) => {
-      console.error('Error deleting thesis topic', error);
-    },
+  deleteTopic(tittle: string): void {
+    this.thesisService.deleteThesisTopic(tittle).subscribe({
+      next: () => {
+        this.loadThesisTopics();
+      },
+      error: (error) => {
+        console.error('Error deleting thesis topic', error);
+      },
     });
   }
-
   enrollStudent(title: string): void {
     const studentEmail = localStorage.getItem('email') || '';
     // Cuenta los temas donde el estudiante está inscrito
@@ -117,22 +113,26 @@ export class TopicListComponent implements OnInit {
         console.error('Error al inscribir al estudiante', error);
       },
     });
-}
+  }
+  isUserEnrolled(topic: any): boolean {
+    return Array.isArray(topic.enrolledStudents) &&
+      topic.enrolledStudents.some((s: string) => s.split(',')[0] === this.email);
+  }
   unsubscribeStudent(title: string): void {
     if (confirm('¿Estás seguro que deseas desuscribirte de este tema?')) {
-    const studentEmail = localStorage.getItem('email') || '';
-    this.thesisService.unsubscribeStudent(title, studentEmail).subscribe({
-      next: () => {
-        this.loadThesisTopics();
-        this.snackBar.open('Estudiante desinscrito correctamente', 'Cerrar', {
-          duration: 2000,
-        });
-      },
-      error: (error) => {
-        console.error('Error al desuscribir al estudiante', error);
-      },
-    });
+      const studentEmail = localStorage.getItem('email') || '';
+      this.thesisService.unsubscribeStudent(title, studentEmail).subscribe({
+        next: () => {
+          this.loadThesisTopics();
+          this.snackBar.open('Estudiante desinscrito correctamente', 'Cerrar', {
+            duration: 2000,
+          });
+        },
+        error: (error) => {
+          console.error('Error al desuscribir al estudiante', error);
+        },
+      });
+    }
   }
-  }
-  
+
 }

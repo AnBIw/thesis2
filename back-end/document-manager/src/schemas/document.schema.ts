@@ -18,7 +18,7 @@ export const DocumentSchema = new Schema({
 // interface para definir la estructura del documento
 // forma en que se maneja la información en el código
 export interface Document extends MongooseDocument {
-  filename: string; 
+  filename: string;
   path: string;
   mimetype: string;
   size: number;
@@ -29,27 +29,3 @@ export interface Document extends MongooseDocument {
   status: string;
   description: string;
 }
-
-
-// @Schema()
-// export class Document {
-//   @Prop()
-//   filename: string;
-
-//   @Prop()
-//   path: string;
-
-//   @Prop()
-//   mimetype: string;
-
-//   @Prop()
-//   size: number;
-
-//   @Prop()
-//   createdAt: Date;
-
-//   @Prop()
-//   description: string;
-// }
-
-// export const DocumentSchema = SchemaFactory.createForClass(Document);

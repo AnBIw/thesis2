@@ -10,17 +10,17 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { HttpClient } from '@angular/common/http';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { MatOption, MatOptionModule } from '@angular/material/core';
+import { MatOptionModule } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
-import { MatTabsModule } from '@angular/material/tabs'; // Importa MatTabsModule si usas tabs
+import { MatTabsModule } from '@angular/material/tabs';
 import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-admin-panel',
   standalone: true,
   imports: [
-    DocumentListComponent,   
-    UploadDocumentComponent, 
+    DocumentListComponent,
+    UploadDocumentComponent,
     TopicListComponent,
     CommonModule,
     FormsModule,
@@ -45,14 +45,14 @@ export class AdminPanelComponent {
     role: string;
     specialty?: string; // Solo se usará si el rol es 'professor'
   } = {
-    email: '',
-    name: '',
-    password: '',
-    role: '',
-    specialty: ''
-  };
+      email: '',
+      name: '',
+      password: '',
+      role: '',
+      specialty: ''
+    };
 
-  constructor(private http: HttpClient, private snackBar: MatSnackBar) {}
+  constructor(private http: HttpClient, private snackBar: MatSnackBar) { }
 
   createUser() {
     // Si no es profesor, no enviar specialty

@@ -4,7 +4,7 @@ import { ThesisTopic } from '../interfaces/thesis-topic.interface';
 
 @Controller('thesis-topics')
 export class ThesisTopicsController {
-  constructor(private readonly thesisTopicsService: ThesisTopicsService) {}
+  constructor(private readonly thesisTopicsService: ThesisTopicsService) { }
 
   @Post()
   async create(@Body() topic: ThesisTopic): Promise<ThesisTopic> {
@@ -23,11 +23,11 @@ export class ThesisTopicsController {
   }
   @Post(':id/enroll')
   async enrollStudent(
-  @Param('id') id: string,
-  @Body('email') email: string,
-  @Body('name') name: string,
+    @Param('id') id: string,
+    @Body('email') email: string,
+    @Body('name') name: string,
   ): Promise<void> {
-  await this.thesisTopicsService.enrollStudent(id, email);
+    await this.thesisTopicsService.enrollStudent(id, email);
   }
   @Post(':id/unroll')
   async unsubscribeStudent(
@@ -35,5 +35,5 @@ export class ThesisTopicsController {
     @Body('email') email: string,
   ): Promise<void> {
     await this.thesisTopicsService.unsubscribeStudent(id, email);
-}
+  }
 }

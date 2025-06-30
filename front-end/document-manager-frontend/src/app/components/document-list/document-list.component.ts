@@ -35,22 +35,21 @@ export class DocumentListComponent implements OnInit {
   searchControl = new FormControl(''); // Control del campo de búsqueda
   userRole: string = ""
 
-  constructor(private documentService: DocumentService) {}
+  constructor(private documentService: DocumentService) { }
 
   ngOnInit(): void {
     this.loadDocuments();
-    this.userRole = localStorage.getItem('userRole') || ''; // Obtener el rol del usuario desde el almacenamiento locals
-
+    this.userRole = localStorage.getItem('userRole') || ''; 
     // Escuchar cambios en el campo de búsqueda
     this.searchControl.valueChanges
-    .pipe(
-      debounceTime(300), // Esperar 300ms después de cada tecla
-      distinctUntilChanged() // Ignorar si el valor no cambia
-    )
-    .subscribe((searchTerm) => {
-      this.filterDocuments(searchTerm || '');
-    });
-}
+      .pipe(
+        debounceTime(300), // Esperar 300ms después de cada tecla
+        distinctUntilChanged() // Ignorar si el valor no cambia
+      )
+      .subscribe((searchTerm) => {
+        this.filterDocuments(searchTerm || '');
+      });
+  }
 
   loadDocuments(): void {
     this.documentService.getDocuments().subscribe({
@@ -97,10 +96,10 @@ export class DocumentListComponent implements OnInit {
   }
 
   confirmDelete(id: string): void {
-  if (window.confirm('¿Estás seguro de que deseas eliminar este documento?')) {
-    this.deleteDocument(id);
+    if (window.confirm('¿Estás seguro de que deseas eliminar este documento?')) {
+      this.deleteDocument(id);
+    }
   }
-}
 
   deleteDocument(id: string): void {
     this.documentService.deleteDocument(id).subscribe({
@@ -115,18 +114,69 @@ export class DocumentListComponent implements OnInit {
   }
   // Funcion del buscador
   filterDocuments(searchTerm: string): void {
-    if (!searchTerm) {
-      this.filteredDocuments = this.documents; // Si no hay término de búsqueda, mostrar todos los documentos
+    // Si es un rango de años, mantenlo igual
+    if (searchTerm.match(/^\d{4}\s*-\s*\d{4}$/)) {
+      const [start, end] = searchTerm.split('-').map(y => Number(y.trim()));
+      this.filteredDocuments = this.documents.filter((document) => {
+        const docYear = Number(document.age);
+        return docYear >= start && docYear <= end;
+      });
+      this.applySort();
       return;
     }
-    // Filtrar documentos por coincidencia en el nombre del archivo
-    this.filteredDocuments = this.documents.filter((document) =>
-      document.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      document.authors.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      document.age.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      document.status.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      document.description.toLowerCase().includes(searchTerm.toLowerCase())  
-  );
+    // Búsqueda por palabras clave
+    const keywords = searchTerm.toLowerCase().split(' ').filter(k => k.trim() !== '');
+    this.filteredDocuments = this.documents.filter((document) => {
+      // Junta todos los campos relevantes en un solo string
+      const docText = [
+        document.title,
+        document.authors,
+        document.age,
+        document.status,
+        document.description
+      ].join(' ').toLowerCase();
+
+      // Verifica que TODAS las palabras clave estén presentes
+      return keywords.every(keyword => docText.includes(keyword));
+    });
+
+    this.applySort();
+  }
+  sortColumn: string = '';
+  sortDirection: 'asc' | 'desc' = 'asc';
+
+  sortBy(column: string) {
+    if (this.sortColumn === column) {
+      this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.sortColumn = column;
+      this.sortDirection = 'asc';
+    }
+    this.applySort();
+  }
+
+  applySort() {
+    this.filteredDocuments = [...this.filteredDocuments].sort((a, b) => {
+      let valA = a[this.sortColumn];
+      let valB = b[this.sortColumn];
+
+      if (this.sortColumn === 'age') {
+        const isEmptyA = !valA || isNaN(Number(valA));
+        const isEmptyB = !valB || isNaN(Number(valB));
+        if (isEmptyA && isEmptyB) return 0;
+        if (isEmptyA) return 1;
+        if (isEmptyB) return -1;
+        valA = Number(valA);
+        valB = Number(valB);
+      } else {
+        // Normaliza para ignorar tildes y mayúsculas/minúsculas
+        valA = valA?.toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '') || '';
+        valB = valB?.toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '') || '';
+      }
+      if (valA < valB) return this.sortDirection === 'asc' ? -1 : 1;
+      if (valA > valB) return this.sortDirection === 'asc' ? 1 : -1;
+      return 0;
+    });
   }
 
 }

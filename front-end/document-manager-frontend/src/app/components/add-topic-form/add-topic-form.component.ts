@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -9,7 +9,6 @@ import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
 import { ThesisService } from '../../services/thesis.service';
 import { ThesisTopic } from '../../models/thesis-topic.model';
-import { LoginComponent } from '../login/login.component';
 
 @Component({
   selector: 'add-topic-form',
@@ -33,7 +32,7 @@ export class AddTopicFormComponent {
   toggleMinimize() {
     this.isMinimized = !this.isMinimized;
   }
-  professorName: string = localStorage.getItem('name') || ''; // Obtiene el nombre del profesor desde el localStorage
+  professorName: string = localStorage.getItem('name') || ''; 
   thesisTopics: ThesisTopic[] = [];
   newTopic: ThesisTopic = {
     id: '',
@@ -41,41 +40,29 @@ export class AddTopicFormComponent {
     description: '',
     avaliableSlots: 0,
     enrolledStudents: [],
-    professor: localStorage.getItem('name') || '', // Obtiene el nombre del profesor desde el localStorage
+    professor: localStorage.getItem('name') || '',
   };
-  constructor(private thesisService: ThesisService) {}
+  constructor(private thesisService: ThesisService) { }
 
   ngOnInit(): void {
-    //console.log(this.thesisTopics);
   }
 
   addTopic(): void {
     this.thesisService.addThesisTopic(this.newTopic).subscribe({
       next: (response) => {
-        this.newTopic = { 
-          id: '', 
+        this.newTopic = {
+          id: '',
           title: '',
-          description: '', 
-          professor: localStorage.getItem('name') || '', // Obtén el nombre del profesor desde el localStorage
-          avaliableSlots: 0, 
-          enrolledStudents	: [] 
+          description: '',
+          professor: localStorage.getItem('name') || '',
+          avaliableSlots: 0,
+          enrolledStudents: []
         };
-      console.log('Thesis topic added successfully', response);
+        console.log('Thesis topic added successfully', response);
       },
       error: (error) => {
         console.error('Error adding thesis topic', error);
       },
     });
   }
-
-  // deleteTopic(id: string): void {
-  //   this.thesisService.deleteThesisTopic(id).subscribe({
-  //     next: () => {
-  //       //this.loadThesisTopics();
-  //     },
-  //     error: (error) => {
-  //       console.error('Error deleting thesis topic', error);
-  //     },
-  //   });
-  // }
 }

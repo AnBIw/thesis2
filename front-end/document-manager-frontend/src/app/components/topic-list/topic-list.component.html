@@ -4,12 +4,12 @@
       <h3>Lista de Temas de Tesis por Profesor</h3>
       <div *ngFor="let professor of professors">
         <!-- Información del Profesor -->
-        <mat-card class="professor-card">
+        <mat-card class="professor-card" >
           <mat-card-header>
-            <mat-card-title>{{ professor.name }}</mat-card-title>
+            <mat-card-title >{{ professor.name }}</mat-card-title>
           <mat-card-subtitle>
             <ng-container *ngFor="let spec of professor.specialty.split(','); let last = last">
-              <span style="display: block; margin-left: 60px; font-size: 0.95em; font-weight: normal;">
+              <span style="display: block; margin-left: 60px; font-size: 0.95em; font-weight: normal; ">
                 {{ spec.trim() }}
               </span>
             </ng-container>
@@ -18,7 +18,7 @@
         </mat-card>
 
         <!-- Tabla de Temas de Tesis -->
-        <table mat-table [dataSource]="getTopicsByProfessor(professor.name)" class="mat-elevation-z8 thesis-table">
+        <table mat-table [dataSource]="getTopicsByProfessor(professor.name)" class="mat-elevation-z8 thesis-table" >
           <!-- Título Column -->
           <ng-container matColumnDef="title">
             <th mat-header-cell *matHeaderCellDef> Título </th>
@@ -31,21 +31,22 @@
             <td mat-cell *matCellDef="let topic"> {{ topic.description }} </td>
           </ng-container>
 
-          <!-- CUpos Column -->
+          <!-- Cupos Column -->
           <ng-container matColumnDef="avaliableSlots">
-            <th mat-header-cell *matHeaderCellDef> Cupos </th>
+            <th mat-header-cell *matHeaderCellDef > Cupos </th>
             <td mat-cell *matCellDef="let topic"> {{ topic.avaliableSlots }} </td>
           </ng-container>
 
           <!-- Inscritos Column -->
           <ng-container matColumnDef="enrollStudent">
             <th mat-header-cell *matHeaderCellDef> Estudiantes Inscritos</th>
-            <td mat-cell *matCellDef="let topic">
-              <ng-container *ngFor="let student of topic.enrolledStudents; let last = last">
-                <div class="student-entry">
-                  <span class="student-email">{{ student.split(',')[0] }}</span>
+            <td mat-cell *matCellDef="let topic" [ngClass]="{'inscrito': isUserEnrolled(topic)}">
+                  <strong style="color:#1976d2;">({{ topic.enrolledStudents?.length || 0 }})</strong>
+              <ng-container  *ngFor="let student of topic.enrolledStudents; let last = last">
+                <div class="student-entry" >
+                  <span class="student-email" >{{ student.split(',')[0] }}</span>
                 </div>
-              <div *ngIf="!last" class="student-separator">---</div>
+              <div *ngIf="!last"  class="student-separator">---</div>
             </ng-container>
           </td>
           </ng-container>

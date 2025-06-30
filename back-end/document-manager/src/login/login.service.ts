@@ -7,10 +7,10 @@ import { Model } from 'mongoose'
 
 @Injectable()
 export class LoginService {
-  constructor(@InjectModel(User.name) private readonly userModel: Model<User>) {}
+  constructor(@InjectModel(User.name) private readonly userModel: Model<User>) { }
 
   async validuser(email: string, password: string): Promise<User | null> {
-    const user = await this.userModel .findOne({ email }).exec();
+    const user = await this.userModel.findOne({ email }).exec();
     if (user && user.password === password) {
       return user;
     } else {

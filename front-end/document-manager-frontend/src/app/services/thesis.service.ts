@@ -4,25 +4,21 @@ import { Observable } from 'rxjs';
 import { ThesisTopic } from '../models/thesis-topic.model';
 
 @Injectable({
-  providedIn: 'root',
+    providedIn: 'root',
 })
 
 export class ThesisService {
-    private apiURL = 'http://localhost:3000/auth'; // Cambia la URL si es necesario
-
-    constructor(private http: HttpClient) {}
-
+    //obtener profesores y temas de tesis
+    private apiURL = 'http://localhost:3000/auth';
+    constructor(private http: HttpClient) { }
     getProfessors(): Observable<{ name: string; specialty: string }[]> {
         return this.http.get<{ name: string; specialty: string }[]>(`${this.apiURL}/profesores`);
     }
-      getThesisTopics(): Observable<ThesisTopic[]> {
+    getThesisTopics(): Observable<ThesisTopic[]> {
         return this.http.get<ThesisTopic[]>(`${this.apiURL}/temas`);
     }
+    //operaciones con las tesis
     private url1 = 'http://localhost:3000/thesis-topics';
-
-    // getThesisTopics(): Observable<ThesisTopic[]> {
-    //     return this.http.get<ThesisTopic[]>(this.url1);
-    // }
 
     addThesisTopic(thesisTopic: ThesisTopic): Observable<ThesisTopic> {
         return this.http.post<ThesisTopic>(this.url1, thesisTopic);
@@ -37,8 +33,8 @@ export class ThesisService {
     }
 
     enrollStudent(tittle: string, email: string): Observable<void> {
-        return this.http.post<void>(`${this.url1}/${tittle}/enroll`, {  email });
-      }
+        return this.http.post<void>(`${this.url1}/${tittle}/enroll`, { email });
+    }
     unsubscribeStudent(tittle: string, email: string) {
         return this.http.post<void>(`${this.url1}/${tittle}/unroll`, { name, email });
     }

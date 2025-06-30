@@ -8,7 +8,7 @@ import { Observable } from 'rxjs';
 export class DocumentService {
   private apiUrl = 'http://localhost:3000/documents'; // Ajusta la URL según tu backend
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   uploadDocument(
     file: File,
@@ -25,8 +25,8 @@ export class DocumentService {
     formData.append('mimetype', file.type);
     formData.append('title', title);
     formData.append('authors', authors);
-    formData.append('age', age); 
-    formData.append('status', status); 
+    formData.append('age', age);
+    formData.append('status', status);
     formData.append('description', description)
 
     return this.http.post(`${this.apiUrl}/upload`, formData);
@@ -51,5 +51,5 @@ export class DocumentService {
   deleteDocument(id: string): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${id}`);
   }
-  
+
 }

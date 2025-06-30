@@ -18,12 +18,14 @@ export class User extends Document {
   @Prop()
   specialty: string;
 
-  @Prop({ type: [{ 
-  title: String, 
-  description: String, 
-  avaliableSlots: Number, 
-  enrolledStudents: [String] 
-  }], default: [] })
+  @Prop({
+    type: [{
+      title: String,
+      description: String,
+      avaliableSlots: Number,
+      enrolledStudents: [String]
+    }], default: []
+  })
   topics: any[];
 }
 

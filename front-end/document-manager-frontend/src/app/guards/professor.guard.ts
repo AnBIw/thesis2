@@ -6,7 +6,7 @@ import { CanActivate, Router } from '@angular/router';
   providedIn: 'root'
 })
 export class ProfesorGuard implements CanActivate {
-  constructor(private router: Router) {}
+  constructor(private router: Router) { }
 
   canActivate(): boolean {
     const role = localStorage.getItem('userRole');

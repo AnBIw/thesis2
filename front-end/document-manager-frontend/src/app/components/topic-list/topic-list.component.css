@@ -105,4 +105,6 @@ mat-card-content table {
 mat-icon {
   vertical-align: middle;
 }
-
+.inscrito {
+  background-color: #ffe082 !important;
+}

@@ -5,10 +5,10 @@
     </mat-card-header>
     <mat-card-content>
       <div class="search-section">
-        <mat-form-field appearance="outline" class="search-bar">
+        <mat-form-field appearance="outline" style="width: 100%; margin-bottom: 16px;">
           <mat-label>Buscar documento</mat-label>
-          <input matInput [formControl]="searchControl" placeholder="Título, autor, etc.">
-          <button mat-icon-button matSuffix *ngIf="searchControl.value" (click)="searchControl.setValue('')">
+          <input matInput [formControl]="searchControl" placeholder="Título, autor, año, profesor, palabras clave...">
+          <button *ngIf="searchControl.value" matSuffix mat-icon-button aria-label="Limpiar" (click)="searchControl.setValue('')">
             <mat-icon>close</mat-icon>
           </button>
         </mat-form-field>
@@ -18,7 +18,13 @@
 
         <!-- Título Column -->
         <ng-container matColumnDef="title">
-          <th mat-header-cell *matHeaderCellDef> Título </th>
+          <th mat-header-cell *matHeaderCellDef (click)="sortBy('title')" 
+            style="cursor:pointer;">
+            Título
+              <mat-icon *ngIf="sortColumn === 'title'">
+                {{sortDirection === 'asc' ? 'arrow_upward' : 'arrow_downward'}}
+              </mat-icon>
+          </th>
           <td mat-cell *matCellDef="let doc">
             <span class="doc-title-cell">{{ doc.title }}</span>
           </td>
@@ -26,19 +32,32 @@
 
         <!-- Autores Column -->
         <ng-container matColumnDef="authors">
-          <th mat-header-cell *matHeaderCellDef> Autor(es) </th>
+          <th mat-header-cell *matHeaderCellDef (click)="sortBy('authors')" style="cursor:pointer;">
+            Autor(es)
+            <mat-icon *ngIf="sortColumn === 'authors'">
+              {{sortDirection === 'asc' ? 'arrow_upward' : 'arrow_downward'}}
+            </mat-icon>
+          </th>
           <td mat-cell *matCellDef="let doc"> {{ doc.authors }} </td>
         </ng-container>
 
         <!-- Fecha Column -->
         <ng-container matColumnDef="date">
-          <th mat-header-cell *matHeaderCellDef> Año </th>
+          <th mat-header-cell *matHeaderCellDef (click)="sortBy('age')" style="cursor:pointer;">
+            Año
+            <mat-icon *ngIf="sortColumn === 'age'">
+              {{sortDirection === 'asc' ? 'arrow_upward' : 'arrow_downward'}}</mat-icon>
+          </th>
           <td mat-cell *matCellDef="let doc"> {{ doc.age }} </td>
         </ng-container>
 
         <!-- Estado Column -->
         <ng-container matColumnDef="status">
-          <th mat-header-cell *matHeaderCellDef> Profesor </th>
+          <th mat-header-cell *matHeaderCellDef (click)="sortBy('status')" style="cursor:pointer;">
+            Profesor
+            <mat-icon *ngIf="sortColumn === 'status'">
+              {{sortDirection === 'asc' ? 'arrow_upward' : 'arrow_downward'}}</mat-icon>
+          </th>
           <td mat-cell *matCellDef="let doc"> {{ doc.status }} </td>
         </ng-container>
 

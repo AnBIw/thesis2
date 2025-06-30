@@ -12,7 +12,7 @@ export class DocumentsService {
   constructor(
     @InjectModel('Document') private readonly documentModel: Model<Document>,
     @InjectModel('RemovedDocument') private readonly removedDocumentModel: Model<RemovedDocument>,
-  ) {}
+  ) { }
 
   async create(createDocumentDto: CreateDocumentDto): Promise<Document> {
     const createdDocument = new this.documentModel(createDocumentDto);
@@ -83,7 +83,6 @@ export class DocumentsService {
         createdAt: document.createdAt,
       });
       await removedDocument.save();
-
       // No eliminamos el archivo del sistema de archivos, solo lo movemos en la base de datos
     }
 

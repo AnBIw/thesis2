@@ -7,34 +7,33 @@ import { Response } from 'express';
 import { RemovedDocument } from '../schemas/removed-document.schema';
 import * as Multer from 'multer';
 import * as fs from 'fs';
-import * as path from 'path';
 
 @Controller('documents')
 export class DocumentsController {
-  constructor(private readonly documentsService: DocumentsService) {}
-//-------------- POST --------------
-@Post('upload')
-@UseInterceptors(FileInterceptor('file'))
-async uploadFile(@UploadedFile() file, @Body() createDocumentDto: CreateDocumentDto): Promise<Document> {
-  // Validar que el archivo sea un PDF
-  if (file.mimetype !== 'application/pdf') {
-    throw new BadRequestException('Only PDF files are allowed');
+  constructor(private readonly documentsService: DocumentsService) { }
+  //-------------- POST --------------
+  @Post('upload')
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadFile(@UploadedFile() file, @Body() createDocumentDto: CreateDocumentDto): Promise<Document> {
+    // Validar que el archivo sea un PDF
+    if (file.mimetype !== 'application/pdf') {
+      throw new BadRequestException('Only PDF files are allowed');
+    }
+    const document = {
+      ...createDocumentDto,
+      filename: file.originalname,
+      path: file.path,
+      mimetype: file.mimetype,
+      size: file.size,
+    };
+    return this.documentsService.create(document);
   }
-  const document = {
-    ...createDocumentDto,
-    filename: file.originalname,
-    path: file.path,
-    mimetype: file.mimetype,
-    size: file.size,
-  };
-  return this.documentsService.create(document);
-}
-//-------------- GET --------------
+  //-------------- GET --------------
   @Get()
   async findAll(): Promise<Document[]> {
     return this.documentsService.findAll();
   }
-    //ver si la tesis existe dentro de la base de datos
+  //ver si la tesis existe dentro de la base de datos
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<Document> {
     const document = await this.documentsService.findOne(id);
@@ -45,8 +44,8 @@ async uploadFile(@UploadedFile() file, @Body() createDocumentDto: CreateDocument
   }
   @Get('removed')
   async listRemovedDocuments(): Promise<RemovedDocument[]> {
-  return this.documentsService.listRemovedDocuments();
-}
+    return this.documentsService.listRemovedDocuments();
+  }
   //visualizar la tesis
   @Get('preview/:id')
   async preview(@Param('id') id: string, @Res() res: Response): Promise<void> {

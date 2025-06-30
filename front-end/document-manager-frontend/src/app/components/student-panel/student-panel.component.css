@@ -28,7 +28,7 @@
 .column {
   background-color: rgba(255, 255, 255, 0.7); /* Blanco con 25% opacidad */
   flex: 1;
-  max-height: 80vh;    /* Ajusta la altura máxima según tu diseño */
+  max-height: 85vh;    /* Ajusta la altura máxima según tu diseño */
   overflow-y: auto;
   min-width: 0;        /* Para evitar desbordes en flexbox */
 }

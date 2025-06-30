@@ -35,4 +35,4 @@ import * as path from 'path';
   controllers: [DocumentsController],
   providers: [DocumentsService],
 })
-export class DocumentsModule {}
+export class DocumentsModule { }
