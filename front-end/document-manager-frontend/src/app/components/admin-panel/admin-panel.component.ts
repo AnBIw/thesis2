@@ -9,7 +9,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { HttpClient } from '@angular/common/http';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatOptionModule } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTabsModule } from '@angular/material/tabs';
@@ -32,7 +32,8 @@ import { MatIconModule } from '@angular/material/icon';
     MatSelectModule,
     FormsModule,
     MatTabsModule,
-    MatIconModule
+    MatIconModule,
+    MatSnackBarModule
   ],
   templateUrl: './admin-panel.component.html',
   styleUrl: './admin-panel.component.css'
@@ -71,6 +72,35 @@ export class AdminPanelComponent {
       }
     });
   }
+
+  // Validar si el formulario es válido
+  isFormValid(): boolean {
+    const { name, email, password, role, specialty } = this.newUser;
+
+    // Validaciones básicas
+    if (!name?.trim() || !email?.trim() || !password?.trim() || !role?.trim()) {
+      return false;
+    }
+
+    // Validar email básico
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return false;
+    }
+
+    // Validar contraseña mínima
+    if (password.length < 8) {
+      return false;
+    }
+
+    // Si es profesor, validar que tenga especialidades
+    if (role === 'professor' && !specialty?.trim()) {
+      return false;
+    }
+
+    return true;
+  }
+
   toggleMinimize() {
     this.isMinimized = !this.isMinimized;
   }

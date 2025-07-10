@@ -1,17 +1,510 @@
-mat-card {
-    margin: 0 auto; 
-    max-width: 1200px;
-    padding: 4px
+/* Contenedor principal del panel de admin */
+.admin-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  min-height: 100vh;
 }
 
-.container {
+/* Header del panel de administración */
+.admin-header {
+  text-align: center;
+  margin-bottom: 30px;
+  padding: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 16px;
+  color: white;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.admin-icon {
+  font-size: 48px !important;
+  width: 48px !important;
+  height: 48px !important;
+  margin-bottom: 10px;
+  color: #ffd700;
+}
+
+.admin-header h2 {
+  margin: 10px 0;
+  font-size: 2.2rem;
+  font-weight: 600;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.admin-subtitle {
+  font-size: 1.1rem;
+  opacity: 0.9;
+  margin: 0;
+  font-weight: 400;
+}
+
+/* Tarjeta de gestión de usuarios */
+.user-management-card {
+  margin-bottom: 30px;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  background: white;
+  overflow: hidden;
+}
+
+.section-header {
+  background: linear-gradient(135deg, #4a8c5e 0%, #3d7a4e 100%);
+  color: white;
+  padding: 20px;
+  margin: 0 !important;
+}
+
+.section-header mat-card-title {
+  color: white !important;
+  font-size: 1.4rem;
+  font-weight: 600;
   display: flex;
-  justify-content: center;   /* Centra horizontalmente */
-  gap: 10px;                 /* Espacio entre columnas, opcional */
-  padding: 2px;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
 }
-.column {
+
+.section-header mat-card-title mat-icon {
+  font-size: 24px;
+  color: #a8e6a3;
+}
+
+.minimize-button {
+  color: white !important;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.minimize-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1);
+}
+
+/* Contenido del formulario de usuario */
+.user-form-content {
+  padding: 30px;
+}
+
+.form-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 30px;
+  margin-bottom: 30px;
+}
+
+.form-column {
+  transition: opacity 0.3s ease;
+}
+
+.form-column.hidden {
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.form-section {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 20px;
+  height: 100%;
+  border: 1px solid #e9ecef;
+  transition: all 0.3s ease;
+}
+
+.form-section:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.section-title {
+  color: #2c3e50;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 20px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.section-title mat-icon {
+  color: #4a8c5e;
+  font-size: 20px;
+}
+
+.form-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+/* Selección de rol */
+.role-selection {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.role-info {
+  margin-top: 16px;
+}
+
+.role-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 12px;
+  border: 2px solid;
+  transition: all 0.3s ease;
+}
+
+.role-card mat-icon {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.role-details strong {
+  display: block;
+  font-size: 1.1rem;
+  margin-bottom: 4px;
+}
+
+.role-details p {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.student-role {
+  background: rgba(25, 118, 210, 0.1);
+  border-color: #1976d2;
+  color: #1976d2;
+}
+
+.student-role mat-icon {
+  color: #1976d2;
+}
+
+.professor-role {
+  background: rgba(74, 140, 94, 0.1);
+  border-color: #4a8c5e;
+  color: #4a8c5e;
+}
+
+.professor-role mat-icon {
+  color: #4a8c5e;
+}
+
+.admin-role {
+  background: rgba(211, 47, 47, 0.1);
+  border-color: #d32f2f;
+  color: #d32f2f;
+}
+
+.admin-role mat-icon {
+  color: #d32f2f;
+}
+
+/* Acciones del formulario */
+.form-actions {
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+  border-top: 1px solid #e9ecef;
+  background: #f8f9fa;
+  margin: 0 -30px -30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.create-user-button {
+  padding: 12px 32px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-radius: 25px;
+  box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
+  transition: all 0.3s ease;
+}
+
+.create-user-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(25, 118, 210, 0.4);
+}
+
+.create-user-button mat-icon {
+  margin-right: 8px;
+}
+
+/* Tarjetas de contenido independientes */
+.content-card {
+  margin-bottom: 30px;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  background: white;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 75vh;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* Altura específica para el panel de documentos */
+.documents-management-card {
+  min-height: 80vh;
+}
+
+.content-card:hover {
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  transform: translateY(-4px);
+}
+
+.content-card .section-header {
+  background: linear-gradient(135deg, #4a8c5e 0%, #3d7a4e 100%);
+  color: white;
+  padding: 24px;
+  margin: 0 !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.content-card .section-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, rgba(255, 255, 255, 0.1) 0%, transparent 100%);
+  pointer-events: none;
+}
+
+.content-card .section-header mat-card-title {
+  color: white !important;
+  font-size: 1.5rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 8px 0;
+  position: relative;
+  z-index: 1;
+}
+
+.content-card .section-header mat-card-title mat-icon {
+  font-size: 28px;
+  width: 28px;
+  height: 28px;
+  color: #a8e6a3;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.content-card .section-header mat-card-subtitle {
+  color: rgba(255, 255, 255, 0.9) !important;
+  font-size: 0.95rem;
+  margin: 0;
+  position: relative;
+  z-index: 1;
+  font-weight: 400;
+}
+
+.scrollable-content {
   flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+  max-height: 80vh;
+  background: linear-gradient(to bottom, #ffffff 0%, #fafbfc 100%);
 }
 
+/* Altura específica para el panel de documentos */
+.documents-management-card .scrollable-content {
+  max-height: 85vh;
+  min-height: 60vh;
+  padding: 20px;
+  /* Asegurar que los botones de acción tengan espacio suficiente */
+}
 
+.scrollable-content::-webkit-scrollbar {
+  width: 10px;
+}
+
+.scrollable-content::-webkit-scrollbar-track {
+  background: #f1f3f4;
+  border-radius: 5px;
+}
+
+.scrollable-content::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, #4a8c5e, #3d7a4e);
+  border-radius: 5px;
+  border: 2px solid #f1f3f4;
+}
+
+.scrollable-content::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(to bottom, #3d7a4e, #2e5d3a);
+}
+
+/* Estilos específicos para cada tipo de card de contenido */
+.topics-management-card .section-header {
+  /* Card de Temas de Tesis */
+  background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
+}
+
+.topics-management-card .section-header mat-card-title mat-icon {
+  color: #bbdefb;
+}
+
+.topics-management-card .scrollable-content::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, #1976d2, #1565c0);
+  border: 2px solid #f1f3f4;
+}
+
+.topics-management-card .scrollable-content::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(to bottom, #1565c0, #0d47a1);
+}
+
+.documents-management-card .section-header {
+  /* Card de Documentos */
+  background: linear-gradient(135deg, #f57c00 0%, #ef6c00 100%);
+}
+
+.documents-management-card .section-header mat-card-title mat-icon {
+  color: #ffe0b2;
+}
+
+.documents-management-card .scrollable-content::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, #f57c00, #ef6c00);
+  border: 2px solid #f1f3f4;
+}
+
+.documents-management-card .scrollable-content::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(to bottom, #ef6c00, #e65100);
+}
+
+/* Efecto de pulso sutil en las cards */
+@keyframes subtle-pulse {
+  0% { box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); }
+  50% { box-shadow: 0 10px 36px rgba(0, 0, 0, 0.12); }
+  100% { box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); }
+}
+
+.content-card {
+  animation: subtle-pulse 4s ease-in-out infinite;
+}
+
+.content-card:hover {
+  animation: none;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .form-container {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  .form-column:nth-child(3) {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 768px) {
+  .admin-container {
+    padding: 10px;
+  }
+  
+  .form-container {
+    grid-template-columns: 1fr;
+  }
+  
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .admin-header h2 {
+    font-size: 1.8rem;
+  }
+  
+  .admin-subtitle {
+    font-size: 1rem;
+  }
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.user-form-content {
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* Estilos para campos de formulario */
+.mat-form-field {
+  width: 100%;
+}
+
+.mat-form-field-appearance-outline .mat-form-field-outline-thick {
+  color: #4a8c5e;
+}
+
+.mat-form-field-appearance-outline.mat-focused .mat-form-field-outline-thick {
+  color: #4a8c5e;
+}
+
+.mat-form-field-appearance-outline.mat-focused .mat-form-field-label {
+  color: #4a8c5e;
+}
+
+/* Mejoras específicas para el repositorio de documentos */
+.documents-management-card .scrollable-content {
+  padding: 20px;
+  /* Asegurar que los botones de acción tengan espacio suficiente */
+}
+
+/* Estilos para mejorar la visibilidad de botones en listas de documentos */
+.documents-management-card ::ng-deep .action-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 120px;
+}
+
+.documents-management-card ::ng-deep .mat-button,
+.documents-management-card ::ng-deep .mat-raised-button,
+.documents-management-card ::ng-deep .mat-icon-button {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Ajustes para tablas de documentos */
+.documents-management-card ::ng-deep table {
+  width: 100%;
+  table-layout: auto;
+}
+
+.documents-management-card ::ng-deep .mat-column-actions {
+  min-width: 140px;
+  width: 140px;
+  text-align: center;
+}
+
+/* Responsive para botones en móviles */
+@media (max-width: 768px) {
+  .documents-management-card .scrollable-content {
+    max-height: 75vh;
+    padding: 16px;
+  }
+  
+  .documents-management-card ::ng-deep .action-buttons {
+    flex-direction: column;
+    gap: 4px;
+    min-width: 100px;
+  }
+}

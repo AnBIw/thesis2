@@ -1,78 +1,174 @@
-<mat-card>
-<mat-card-actions>
-  <button agregar mat-icon-button (click)="toggleMinimize()" 
-  style="margin: auto; width: 50%; font-size: 18px; color:#1976d2">
-    Desea agregar nuevos usuarios
-  </button>
-</mat-card-actions>
-  <div class="container" *ngIf="!isMinimized">
-    <mat-card class="column" style="flex: 1; ">
-      <mat-card-content style="display: flex; flex-direction: column;">
-        <!-- Nombre, email y contraseña -->
-         <h4>Credenciales del nuevo usuario</h4>
-          <mat-form-field appearance="fill" >
-            <mat-label>Nombre</mat-label>
-            <input matInput name="name" [(ngModel)]="newUser.name" required>
-          </mat-form-field>
-          <mat-form-field appearance="fill">
-            <mat-label>Email</mat-label>
-            <input matInput name="email" [(ngModel)]="newUser.email" required>
-          </mat-form-field>
-          <mat-form-field appearance="fill">
-            <mat-label>Contraseña</mat-label>
-            <input matInput type="password" name="password" [(ngModel)]="newUser.password" required>
-          </mat-form-field>
-      </mat-card-content>
-    </mat-card>
-    <!-- Rol -->
-    <mat-card class="column" style="flex: 1; ">
-      <mat-card-content>
-         <h4>Selecciona Rol</h4>
-        <mat-select name="role" [(ngModel)]="newUser.role" 
-        style="background-color: rgb(197, 197, 197); margin: 8px 0; padding: 8px;" required>
-          <mat-option value="students">Estudiante</mat-option>
-          <mat-option value="professor">Profesor</mat-option>
-          <mat-option value="admin">Administrador</mat-option>
-        </mat-select>
-        <div *ngIf="newUser.role === 'students'" style="margin-top:8px; color:#1976d2;">
-          El usuario podrá inscribirse en temas y ver documentos.
-        </div>
-        <div *ngIf="newUser.role === 'professor'" style="margin-top:8px; color:#388e3c;">
-          El usuario podrá crear y gestionar temas, y subir documentos.
-        </div>
-        <div *ngIf="newUser.role === 'admin'" style="margin-top:8px; color:#d32f2f;">
-          El usuario podrá administrar usuarios y gestionar todo el sistema.
-        </div>
-        <button mat-raised-button color="primary" (click)="createUser()" style="margin: 32px 90px; width: 50%;">
-          Agregar usuario
-        </button>
-      </mat-card-content>
-    </mat-card>
-    <!-- Especialidades para profesores -->
-    <mat-card class="column" style="flex: 1; ">
-      <mat-card-content>
-        <h4>Fortalezas y especialidades de Profesor</h4>
-        <mat-form-field appearance="fill" *ngIf="newUser.role === 'professor'">
-          <mat-label>Especialidades</mat-label>
-          <textarea matInput name="specialty" [(ngModel)]="newUser.specialty" rows="7"></textarea>
-        </mat-form-field>
-      </mat-card-content>
-    </mat-card>
+<!-- Panel de Administración Principal -->
+<div class="admin-container">
+  
+  <!-- Header del Panel Admin -->
+  <div class="admin-header">
+    <mat-icon class="admin-icon">admin_panel_settings</mat-icon>
+    <h2>Panel de Administración</h2>
+    <p class="admin-subtitle">Gestiona usuarios, temas y documentos del sistema IntegraTesis</p>
   </div>
-</mat-card>
 
+  <!-- Sección de Gestión de Usuarios -->
+  <mat-card class="user-management-card">
+    <mat-card-header class="section-header">
+      <mat-card-title>
+        <mat-icon>person_add</mat-icon>
+        Gestión de Usuarios
+      </mat-card-title>
+      <button mat-icon-button (click)="toggleMinimize()" class="minimize-button"
+              [title]="isMinimized ? 'Expandir formulario' : 'Minimizar formulario'">
+        <mat-icon>{{ isMinimized ? 'expand_more' : 'expand_less' }}</mat-icon>
+      </button>
+    </mat-card-header>
 
-<div class="container" style="display: flex; justify-content: space-between; gap: 20px;">
-  <!-- Tarjeta para agregar temas -->
-  <mat-card class="column" style="flex: 1; overflow-y: auto; max-height: 85vh;">
-    <mat-card-content>
+    <mat-card-content *ngIf="!isMinimized" class="user-form-content">
+      <div class="form-container">
+        
+        <!-- Columna 1: Credenciales -->
+        <div class="form-column">
+          <div class="form-section">
+            <h4 class="section-title">
+              <mat-icon>badge</mat-icon>
+              Credenciales del Usuario
+            </h4>
+            <div class="form-fields">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Nombre completo</mat-label>
+                <input matInput name="name" [(ngModel)]="newUser.name" required 
+                       placeholder="Ej: Juan Pérez">
+                <mat-icon matSuffix>person</mat-icon>
+              </mat-form-field>
+              
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Email institucional</mat-label>
+                <input matInput type="email" name="email" [(ngModel)]="newUser.email" required
+                       placeholder="usuario@uach.cl">
+                <mat-icon matSuffix>email</mat-icon>
+              </mat-form-field>
+              
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Contraseña</mat-label>
+                <input matInput type="password" name="password" [(ngModel)]="newUser.password" required
+                       placeholder="Mínimo 8 caracteres">
+                <mat-icon matSuffix>lock</mat-icon>
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+
+        <!-- Columna 2: Rol y Permisos -->
+        <div class="form-column">
+          <div class="form-section">
+            <h4 class="section-title">
+              <mat-icon>assignment_ind</mat-icon>
+              Rol y Permisos
+            </h4>
+            <div class="role-selection">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Seleccionar rol</mat-label>
+                <mat-select name="role" [(ngModel)]="newUser.role" required>
+                  <mat-option value="students">
+                    <mat-icon>school</mat-icon>
+                    Estudiante
+                  </mat-option>
+                  <mat-option value="professor">
+                    <mat-icon>person</mat-icon>
+                    Profesor
+                  </mat-option>
+                  <mat-option value="admin">
+                    <mat-icon>admin_panel_settings</mat-icon>
+                    Administrador
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+              
+              <!-- Información del rol seleccionado -->
+              <div class="role-info" *ngIf="newUser.role">
+                <div class="role-card student-role" *ngIf="newUser.role === 'students'">
+                  <mat-icon>school</mat-icon>
+                  <div class="role-details">
+                    <strong>Estudiante</strong>
+                    <p>Puede inscribirse en temas, ver documentos y proponer temas de tesis</p>
+                  </div>
+                </div>
+                
+                <div class="role-card professor-role" *ngIf="newUser.role === 'professor'">
+                  <mat-icon>person</mat-icon>
+                  <div class="role-details">
+                    <strong>Profesor</strong>
+                    <p>Puede crear y gestionar temas, subir documentos y evaluar propuestas</p>
+                  </div>
+                </div>
+                
+                <div class="role-card admin-role" *ngIf="newUser.role === 'admin'">
+                  <mat-icon>admin_panel_settings</mat-icon>
+                  <div class="role-details">
+                    <strong>Administrador</strong>
+                    <p>Acceso completo al sistema, gestión de usuarios y configuraciones</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Columna 3: Especialidades (solo para profesores) -->
+        <div class="form-column" [ngClass]="{'hidden': newUser.role !== 'professor'}">
+          <div class="form-section">
+            <h4 class="section-title">
+              <mat-icon>star</mat-icon>
+              Especialidades y Fortalezas
+            </h4>
+            <mat-form-field appearance="outline" class="full-width" *ngIf="newUser.role === 'professor'">
+              <mat-label>Áreas de especialidad</mat-label>
+              <textarea matInput name="specialty" [(ngModel)]="newUser.specialty" 
+                        rows="6" placeholder="Ej: Ingeniería de Software, Base de Datos, Inteligencia Artificial"></textarea>
+              <mat-icon matSuffix>subject</mat-icon>
+              <mat-hint>Separa las especialidades con comas</mat-hint>
+            </mat-form-field>
+          </div>
+        </div>
+      </div>
+
+      <!-- Botón de crear usuario -->
+      <div class="form-actions">
+        <button mat-raised-button color="primary" (click)="createUser()" 
+                class="create-user-button" [disabled]="!isFormValid()">
+          <mat-icon>person_add</mat-icon>
+          Crear Usuario
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Panel de Temas de Tesis -->
+  <mat-card class="content-card topics-management-card">
+    <mat-card-header class="section-header">
+      <mat-card-title>
+        <mat-icon>topic</mat-icon>
+        Gestión de Temas de Tesis
+      </mat-card-title>
+      <mat-card-subtitle>
+        Administra temas oficiales y propuestas de estudiantes
+      </mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content class="scrollable-content">
       <topic-list></topic-list>
     </mat-card-content>
   </mat-card>
 
-  <!-- Tarjeta para subir documentos y listar documentos -->
-  <mat-card class="column" style="flex: 1; overflow-y: auto; max-height: 85vh;">
-    <mat-card-content>
+  <!-- Panel de Documentos -->
+  <mat-card class="content-card documents-management-card">
+    <mat-card-header class="section-header">
+      <mat-card-title>
+        <mat-icon>description</mat-icon>
+        Gestión de Documentos
+      </mat-card-title>
+      <mat-card-subtitle>
+        Subir y administrar documentos del sistema
+      </mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content class="scrollable-content">
       <app-upload-document></app-upload-document>
       <app-document-list></app-document-list>
     </mat-card-content>
