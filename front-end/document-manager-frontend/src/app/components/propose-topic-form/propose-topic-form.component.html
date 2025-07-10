@@ -1,0 +1,89 @@
+<div class="modal-overlay" (click)="onClose()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>
+          <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+            <span>Proponer Nuevo Tema de Tesis</span>
+            <button mat-icon-button (click)="onClose()" aria-label="Cerrar">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+        </mat-card-title>
+      </mat-card-header>
+      
+      <mat-card-content>
+        <form #topicForm="ngForm" (ngSubmit)="onSubmit()" class="propose-form">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Nombre del Estudiante</mat-label>
+            <input matInput [value]="studentName" readonly />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Proponer a Profesor</mat-label>
+            <mat-select [(ngModel)]="proposedTopic.proposedToProfessor" name="professor" required>
+              <mat-option value="">Seleccionar profesor...</mat-option>
+              <mat-option *ngFor="let professor of professors" [value]="professor.name">
+                {{ professor.name }}
+              </mat-option>
+            </mat-select>
+            <mat-hint>Selecciona el profesor al que deseas proponer este tema</mat-hint>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Título del Tema Propuesto</mat-label>
+            <input 
+              matInput 
+              [(ngModel)]="proposedTopic.title" 
+              name="title" 
+              required 
+              placeholder="Ej: Análisis de algoritmos de machine learning para..."
+            />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Descripción del Tema</mat-label>
+            <textarea 
+              matInput 
+              rows="4" 
+              [(ngModel)]="proposedTopic.description" 
+              name="description" 
+              required
+              placeholder="Describe detalladamente el tema que propones...">
+            </textarea>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Justificación</mat-label>
+            <textarea 
+              matInput 
+              rows="3" 
+              [(ngModel)]="proposedTopic.justification" 
+              name="justification" 
+              required
+              placeholder="Explica por qué este tema es relevante y por qué te interesa...">
+            </textarea>
+          </mat-form-field>
+
+          <div class="button-row">
+            <button 
+              mat-button 
+              type="button" 
+              (click)="onClose()"
+              class="cancel-button">
+              Cancelar
+            </button>
+            <button 
+              mat-raised-button 
+              color="primary" 
+              type="submit" 
+              [disabled]="!isFormValid()">
+              <mat-icon>send</mat-icon>
+              Enviar Propuesta
+            </button>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

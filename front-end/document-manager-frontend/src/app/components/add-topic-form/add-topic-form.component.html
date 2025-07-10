@@ -3,8 +3,6 @@
     <h2 class="professor-greeting">¡Hola, {{ professorName }}!</h2>
     <button mat-icon-button (click)="toggleMinimize()" aria-label="Minimizar formulario">
       <mat-icon>{{ isMinimized ? 'expand_more' : 'expand_less' }}</mat-icon>
-      <span style="font-size: 10px;">
-      </span>
     </button>
   </div>
   <mat-card *ngIf="!isMinimized">

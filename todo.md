@@ -22,9 +22,14 @@
 [x] crear un portal de creacion de usuarios
 [x] crear admin
 [] crear continuidad de solicitudes de temas de tesis
-    - [] profesor apruebe
-    - [] mostrar seleccionados o preseleccion
-    - [] boton que redirija a outlook o gmail
+    - [x] profesor apruebe
+    - [x] mostrar seleccionados o preseleccion
+    - [x] boton que redirija a outlook o gmail
+    - [x] boton para que los alumnos propogan un tema
+    - [] los profesores puedan colocar su horario
+    - [x] que los profesores solos puedan borrar sus temas
+    - [] mostar quieres fueron escogidos en los temas
+    - [x] alumnos al proponer sea privado - pero que se vea por el profesor
 
 [x] limpiar codigo y comentar de forma idonea
 [x] filtros de biblioteca

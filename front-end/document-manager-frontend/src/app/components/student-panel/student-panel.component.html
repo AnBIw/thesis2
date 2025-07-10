@@ -1,7 +1,14 @@
-
 <div class="container" style="display: flex; justify-content: space-between; gap: 20px;">
     <mat-card class="column" style="flex: 1;">
-      <h4 class="student-greeting">¡Hola, {{ StudentName }}!</h4>
+      <div class="student-header">
+        <div class="student-greeting-section">
+          <h3 class="student-greeting">¡Hola, {{ StudentName }}!</h3>
+        </div>
+        <button mat-raised-button color="accent" (click)="openProposeTopicForm()" class="propose-btn">
+          <mat-icon>lightbulb_outline</mat-icon>
+          Proponer Tema
+        </button>
+      </div>
       <mat-card-content>
         <topic-list></topic-list>
       </mat-card-content>
@@ -13,3 +20,10 @@
       </mat-card-content>
     </mat-card>
   </div>
+
+  <!-- Modal para proponer tema -->
+  <app-propose-topic-form 
+    *ngIf="showProposeForm" 
+    (close)="closeProposeTopicForm()"
+    (topicProposed)="onTopicProposed($event)">
+  </app-propose-topic-form>

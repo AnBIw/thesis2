@@ -1,13 +1,15 @@
 <div class="header-banner">
-  <img src="assets/logo-uach.png" alt="UACh" class="corner-img left-img">
-  <!-- Botones de navegación -->
-<div class="nav-buttons" style="text-align:center; margin: 10px 0;">
-  <button mat-raised-button color="warn" (click)="logout()">Cerrar Sesión</button>
-</div>
+  <div class="left-section">
+    <img src="assets/logo-uach.png" alt="UACh" class="corner-img left-img">
+    <button mat-raised-button color="warn" (click)="logout()" class="logout-btn">Cerrar Sesión</button>
+  </div>
+  
   <div class="welcome-text">
-    Bienvenido a la Biblioteca Digital de Tesis de la Escuela de  Informática UACh.<br>
+    <h1 class="main-title">IntegraTesis</h1>
+    Bienvenido a la Biblioteca Digital de Tesis de la Escuela de Informática UACh.<br>
     Explora, consulta y comparte el conocimiento generado por nuestra comunidad universitaria.
   </div>
+  
   <img src="assets/icon-uach.png" alt="Informática" class="corner-img right-img">
 </div>
 

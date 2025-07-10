@@ -16,12 +16,20 @@ mat-card {
   font-weight: bold;
   margin-left: 200px;
   margin-bottom: 8px;
+  text-transform: uppercase;
 }
 
 .search-section {
   display: flex;
   justify-content: center;
   margin-bottom: 18px;
+}
+
+.list-title {
+  text-transform: uppercase;
+  font-weight: 600;
+  color: #1a237e;
+  margin-bottom: 16px;
 }
 
 .search-bar {
@@ -35,9 +43,20 @@ mat-card {
   overflow: hidden;
 }
 
+/* Estilos para mostrar toda la información en mayúsculas */
+.doc-table td {
+  text-transform: uppercase;
+}
+
+.doc-table th {
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
 .doc-title-cell {
   font-weight: 500;
   color: #1a237e;
+  text-transform: uppercase;
 }
 
 .status-chip {

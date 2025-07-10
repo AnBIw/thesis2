@@ -8,6 +8,9 @@ import { User, UserSchema } from '../schemas/user.schema';
   controllers: [ThesisTopicsController],
   providers: [ThesisTopicsService],
   imports: [
-      MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),],
-  })
+      MongooseModule.forFeature([
+        { name: User.name, schema: UserSchema }
+      ]),
+  ],
+})
 export class ThesisTopicsModule {}

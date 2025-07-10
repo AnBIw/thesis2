@@ -3,11 +3,11 @@ table {
     margin-bottom: 8px;
   }
   .mat-header-cell, .mat-cell {
-    text-align: left;
-    
+    text-align: center;
+    vertical-align: middle;
   }
   .mat-header-row {
-    background-color: rgba(255, 255, 255, 0.7); /* Blanco con 25% opacidad */
+    background-color: #dee2e6;
   }
   .mat-elevation-z8 {
     box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
@@ -15,43 +15,110 @@ table {
 
 .professor-card {
   margin-bottom: 0;
-  background-color: #73ca94;
+  background: linear-gradient(135deg, #4a8c5e 0%, #3d7a4e 100%);
+  color: #ffffff;
+}
+
+.professor-card mat-card-title {
+  color: #ffffff;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  font-size: 1.3rem;
+  margin-bottom: 8px;
+}
+
+.professor-card mat-card-subtitle {
+  color: #f0f8ff;
+  opacity: 0.9;
+}
+
+.specialties-container {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.specialties-icon {
+  color: #a8e6a3;
+  font-size: 20px;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.specialties-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  flex: 1;
+}
+
+.specialty-tag {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(4px);
+  transition: all 0.3s ease;
+}
+
+.specialty-tag:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
 mat-card-header {
   margin-bottom: 0;
- padding-bottom: 8px;
-  
+  padding: 16px 20px;
 }
 
 mat-card-content > .professor-card {
   margin-bottom: 0;
-  background-color: rgba(255, 255, 255, 0.2); /* Blanco con 25% opacidad */
+  background: linear-gradient(135deg, #4a8c5e 0%, #3d7a4e 100%);
+  color: #ffffff;
 }
 
 mat-card-content table {
-  background-color: rgba(255, 255, 255, 0.2); /* Blanco con 25% opacidad */
+  background-color: rgba(255, 255, 255, 0.85);
   margin-top: 0;
 }
 
 .student-entry {
-  margin-bottom: 2px;
-  line-height: 1.2;
-  padding: 2px 0;
+  margin-bottom: 4px;
+  line-height: 1.3;
+  padding: 4px 0;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .student-name {
   font-weight: bold;
-  font-size: 0.97em;
-  line-height: 1.1;
+  font-size: 0.9em;
+  line-height: 1.2;
+  text-align: center;
 }
 
 .student-email {
-  font-size: 0.93em;
-  color: #4a6947;
-  line-height: 1.1;
+  font-size: 0.85em;
+  color: #332df6;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.student-separator {
+  text-align: center;
+  color: #888;
+  font-size: 0.8em;
+  margin: 4px 0;
+  border-bottom: 1px dotted #ccc;
+  width: 80%;
 }
 
 .thesis-table {
@@ -60,12 +127,82 @@ mat-card-content table {
   border-radius: 10px;
   overflow: hidden;
   background: rgba(255,255,255,0.85);
+  border: 2px solid #e0e0e0;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .thesis-table th, .thesis-table td {
   text-align: center;
   vertical-align: middle;
-  padding: 10px 8px;
+  padding: 16px 12px;
+  border-right: 1px solid #e0e0e0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.thesis-table th {
+  background-color: #e9ecef;
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 0.9em;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid #dee2e6;
+}
+
+/* Ancho específico para cada columna */
+.thesis-table th:nth-child(1), /* Título */
+.thesis-table td:nth-child(1) {
+  width: 22% !important;
+  min-width: 180px;
+}
+
+.thesis-table th:nth-child(2), /* Descripción */
+.thesis-table td:nth-child(2) {
+  width: 42% !important;
+  min-width: 300px;
+  text-align: left;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+.thesis-table th:nth-child(3), /* Cupos/Estado */
+.thesis-table td:nth-child(3) {
+  width: 8% !important;
+  min-width: 80px !important;
+}
+
+.thesis-table th:nth-child(4), /* Estudiantes/Propuesto por */
+.thesis-table td:nth-child(4) {
+  width: 18% !important;
+  min-width: 150px;
+}
+
+.thesis-table th:nth-child(5), /* Acciones */
+.thesis-table td:nth-child(5) {
+  width: 10% !important;
+  min-width: 120px;
+}
+
+/* Eliminar borde derecho de la última columna */
+.thesis-table th:last-child,
+.thesis-table td:last-child {
+  border-right: none;
+}
+
+/* Eliminar borde inferior de la última fila */
+.thesis-table tr:last-child td {
+  border-bottom: none;
+}
+
+/* Hover effect para filas normales */
+.thesis-table tr:hover:not(.proposal-row) {
+  background-color: #f8f9fa;
+  transition: background-color 0.2s ease;
+}
+
+/* Estilo para filas alternadas */
+.thesis-table tr:nth-child(even):not(.proposal-row) {
+  background-color: #fbfbfb;
 }
 
 .topic-title {
@@ -74,32 +211,105 @@ mat-card-content table {
 }
 
 .student-entry {
-  margin-bottom: 2px;
-  line-height: 1.2;
-  padding: 2px 0;
+  margin-bottom: 4px;
+  line-height: 1.3;
+  padding: 4px 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-
+  justify-content: center;
 }
 
 .student-name {
   font-weight: bold;
-  font-size: 0.97em;
-  line-height: 1.1;
+  font-size: 0.9em;
+  line-height: 1.2;
+  text-align: center;
 }
 
 .student-email {
-  font-size: 0.93em;
-  color: #332df6;
-  line-height: 1.1;
+  font-size: 0.85em;
+  color: #1565c0;
+  line-height: 1.2;
+  text-align: center;
 }
 
 .student-separator {
   text-align: center;
   color: #888;
-  font-size: 0.95em;
-  margin: 2px 0;
+  font-size: 0.8em;
+  margin: 4px 0;
+  border-bottom: 1px dotted #ccc;
+  width: 80%;
+}
+
+/* Centrar contenido de propuestas */
+.proposal-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+}
+
+/* Estilos para contenido de celdas */
+.title-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.title-text {
+  font-weight: 600;
+  color: #1a237e;
+  text-align: center;
+  flex: 1;
+  min-width: 0;
+}
+
+.proposal-icon {
+  color: #ff9800 !important;
+  font-size: 20px !important;
+  min-width: 20px;
+}
+
+.privacy-icon {
+  color: #666 !important;
+  font-size: 16px !important;
+  min-width: 16px;
+}
+
+.description-content {
+  text-align: left;
+  line-height: 1.4;
+  padding: 4px 0;
+}
+
+.status-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.slots-number {
+  font-weight: 600;
+  font-size: 1.1em;
+  color: #1976d2;
+  background-color: #e3f2fd;
+  padding: 4px 12px;
+  border-radius: 12px;
+  border: 1px solid #bbdefb;
+}
+
+/* Mejorar alineación de botones de acción */
+.action-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  flex-wrap: wrap;
 }
 
 mat-icon {
@@ -107,4 +317,454 @@ mat-icon {
 }
 .inscrito {
   background-color: #ffe082 !important;
+}
+
+/* Prioridad para inscrito cuando es tema oficial */
+.official-topic-row.inscrito {
+  background-color: #ffe082 !important;
+  border-left: 4px solid #ff9800 !important;
+}
+
+/* Prioridad para inscrito cuando es propuesta */
+.proposal-row.inscrito {
+  background-color: #ffe082 !important;
+  border-left: 4px solid #ff9800 !important;
+}
+
+/* Estilos para propuestas de temas */
+.proposal-row {
+  background-color: #f8f9ff !important; /* Fondo azul muy claro para propuestas */
+  border-left: 4px solid #2196f3; /* Borde azul para identificar propuestas */
+  transition: all 0.2s ease;
+}
+
+.proposal-row td {
+  border-right: 1px solid #bbdefb !important; /* Bordes más suaves para propuestas */
+  border-bottom: 1px solid #bbdefb !important;
+}
+
+/* Efectos hover para filas de propuestas */
+.proposal-row:hover {
+  background-color: #e3f2fd !important;
+  transform: translateX(2px);
+  box-shadow: 0 2px 8px rgba(33, 150, 243, 0.2);
+}
+
+.proposal-row:hover td {
+  border-right: 1px solid #90caf9 !important;
+  border-bottom: 1px solid #90caf9 !important;
+}
+
+.status-preselected {
+  color: #e65100;
+  font-weight: bold;
+  background: linear-gradient(135deg, #fff3e0, #ffe0b2);
+  padding: 6px 12px;
+  border-radius: 16px;
+  border: 1px solid #ff9800;
+  font-size: 0.85em;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 4px rgba(255, 152, 0, 0.2);
+}
+
+.status-pending {
+  color: #0d47a1;
+  font-weight: bold;
+  background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+  padding: 6px 12px;
+  border-radius: 16px;
+  border: 1px solid #2196f3;
+  font-size: 0.85em;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 4px rgba(33, 150, 243, 0.2);
+}
+
+.status-approved {
+  color: #2d5e3a;
+  font-weight: bold;
+  background: linear-gradient(135deg, #f4fbf6, #d4e8d9);
+  padding: 6px 12px;
+  border-radius: 16px;
+  border: 1px solid #73ca94;
+  font-size: 0.85em;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 4px rgba(115, 202, 148, 0.2);
+}
+
+.status-rejected {
+  color: #b71c1c;
+  font-weight: bold;
+  background: linear-gradient(135deg, #ffebee, #ffcdd2);
+  padding: 6px 12px;
+  border-radius: 16px;
+  border: 1px solid #f44336;
+  font-size: 0.85em;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 4px rgba(244, 67, 54, 0.2);
+}
+
+/* Estilos para iconos de propuestas */
+.proposal-row mat-icon {
+  color: #2196f3;
+}
+
+/* Iconos específicos para diferentes estados */
+.proposal-row .status-pending mat-icon {
+  color: #2196f3;
+}
+
+.proposal-row .status-preselected mat-icon {
+  color: #ff9800;
+}
+
+.proposal-row .status-approved mat-icon {
+  color: #73ca94;
+}
+
+.proposal-row .status-rejected mat-icon {
+  color: #f44336;
+}
+
+/* Estilos para columna compacta */
+.compact-header {
+  width: 80px !important;
+  max-width: 80px !important;
+  padding: 8px 2px !important;
+  text-align: center !important;
+  font-size: 0.8rem !important;
+}
+
+.compact-cell {
+  width: 80px !important;
+  max-width: 80px !important;
+  padding: 4px 2px !important;
+  text-align: center !important;
+}
+
+.status-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 24px;
+}
+
+.proposal-status {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Iconos de estado */
+.status-icon {
+  font-size: 20px !important;
+  width: 20px !important;
+  height: 20px !important;
+}
+
+.approved-icon {
+  color: #4caf50 !important;
+}
+
+.rejected-icon {
+  color: #f44336 !important;
+}
+
+/* Ajustar tamaño de badges para estados pendientes/preseleccionados */
+.status-pending,
+.status-preselected {
+  font-size: 0.7rem !important;
+  padding: 2px 4px !important;
+  white-space: nowrap;
+  border-radius: 8px !important;
+}
+
+/* Ajustar números de cupos */
+.slots-number {
+  font-weight: 600;
+  font-size: 1em !important;
+  color: #1976d2;
+  background-color: #e3f2fd;
+  padding: 2px 8px !important;
+  border-radius: 8px !important;
+  border: 1px solid #bbdefb;
+  min-width: 20px;
+}
+
+/* Estilos para botones de aprobar/rechazar */
+button[color="primary"] {
+  color: #73ca94;
+}
+
+button[color="warn"] {
+  color: #f44336;
+}
+
+/* Estilos para contenido privado */
+.private-content {
+  font-style: italic;
+  color: #666;
+  opacity: 0.7;
+}
+
+.private-icon {
+  color: #ff5722;
+  font-size: 16px;
+}
+
+/* Indicador visual de propuesta privada */
+.proposal-row.private {
+  background-color: #fafafa !important;
+  border-left: 4px solid #ff5722;
+}
+
+/* Estilos para mini-fab buttons */
+.mat-mini-fab {
+  width: 32px !important;
+  height: 32px !important;
+  line-height: 32px !important;
+  font-size: 14px !important;
+}
+
+/* Ajustes para emojis en botones */
+button[mat-mini-fab] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  min-height: 32px;
+}
+
+/* Hover effects para botones de acción */
+button[mat-mini-fab]:hover {
+  transform: scale(1.1);
+  transition: transform 0.2s ease;
+}
+
+/* Botón Ver Detalles */
+button[color="accent"] {
+  color: #ff9800;
+}
+
+/* Estilos para temas oficiales de profesores */
+.official-topic-row {
+  background-color: #f4fbf6 !important; /* Fondo verde muy claro consistente */
+  border-left: 4px solid #73ca94; /* Borde verde igual al de la tarjeta del profesor */
+  transition: all 0.2s ease;
+}
+
+.official-topic-row td {
+  border-right: 1px solid #b8e6c7 !important; /* Bordes más suaves para temas oficiales */
+  border-bottom: 1px solid #b8e6c7 !important;
+}
+
+/* Efectos hover para filas de temas oficiales */
+.official-topic-row:hover {
+  background-color: #e8f5eb !important;
+  transform: translateX(2px);
+  box-shadow: 0 2px 8px rgba(115, 202, 148, 0.3);
+}
+
+.official-topic-row:hover td {
+  border-right: 1px solid #9dd9b3 !important;
+  border-bottom: 1px solid #9dd9b3 !important;
+}
+
+/* Estilos para estudiantes inscritos mejorados */
+.enrolled-students-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px;
+}
+
+.students-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+
+.students-icon {
+  color: #1976d2;
+  font-size: 18px;
+}
+
+.students-count {
+  color: #1976d2;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.students-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+.student-card {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  background: rgba(25, 118, 210, 0.08);
+  border-radius: 8px;
+  border-left: 3px solid #1976d2;
+  transition: all 0.2s ease;
+}
+
+.student-card:hover {
+  background: rgba(25, 118, 210, 0.15);
+  transform: translateX(2px);
+}
+
+.student-avatar {
+  color: #1976d2;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.student-email {
+  font-size: 0.8rem;
+  color: #424242;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.no-students {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px;
+  color: #999;
+  font-style: italic;
+  font-size: 0.85rem;
+}
+
+.no-students mat-icon {
+  font-size: 16px;
+}
+
+/* Estilos para propuestas - versión original */
+.proposal-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px;
+}
+
+.clickable-email {
+  cursor: pointer;
+  text-decoration: underline;
+  transition: all 0.3s ease;
+}
+
+.clickable-email:hover {
+  color: #1976d2 !important;
+  font-weight: 600 !important;
+  text-decoration: underline;
+  transform: scale(1.02);
+}
+
+/* Estilos para propuestas procesadas */
+.processed-proposal-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.status-display {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.confirm-button {
+  font-size: 0.8rem !important;
+  padding: 4px 12px !important;
+  min-width: auto !important;
+  height: 32px !important;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border-radius: 16px !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+  transition: all 0.3s ease !important;
+}
+
+.confirm-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3) !important;
+}
+
+.confirm-button mat-icon {
+  font-size: 16px !important;
+  width: 16px !important;
+  height: 16px !important;
+}
+
+/* Estilos para profesor actual */
+.current-professor {
+  border: 2px solid #ffd700 !important;
+  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3) !important;
+}
+
+/* Estilos para badge clickeable de cambio de estado */
+.clickable-status {
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.clickable-status:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+  filter: brightness(1.1);
+}
+
+.change-icon {
+  font-size: 14px !important;
+  width: 14px !important;
+  height: 14px !important;
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+}
+
+.clickable-status:hover .change-icon {
+  opacity: 1;
+  animation: rotate 1s ease-in-out;
+}
+
+@keyframes rotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Efecto visual específico para cada estado clickeable */
+.status-approved.clickable-status:hover {
+  background: linear-gradient(135deg, #ffebee, #ffcdd2) !important;
+  border-color: #f44336 !important;
+  color: #b71c1c !important;
+}
+
+.status-rejected.clickable-status:hover {
+  background: linear-gradient(135deg, #f4fbf6, #d4e8d9) !important;
+  border-color: #73ca94 !important;
+  color: #2d5e3a !important;
 }

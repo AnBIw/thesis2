@@ -1,8 +1,11 @@
-<mat-card class="upload-card">
+<mat-card class="upload-card" [class.minimized]="isMinimized">
   <mat-card-header>
     <div style="width:100%; display:flex; justify-content:space-between; align-items:center;">
-      <mat-card-title style="text-align:center; width:100%; font-size: 1.2rem;">Subir Tesis</mat-card-title>
-      <button mat-icon-button (click)="toggleMinimize()" aria-label="Minimizar formulario">
+      <mat-card-title style="text-align:center; width:100%; font-size: 1.2rem; margin-bottom: 16px;">
+        {{ isMinimized ? 'Subir Tesis' : 'Subir Nueva Tesis' }}
+      </mat-card-title>
+      <button mat-icon-button (click)="toggleMinimize()" aria-label="Minimizar formulario"
+              style="color: #2196f3; background-color: rgba(33, 150, 243, 0.1); border-radius: 50%; margin-bottom: 16px;">
         <mat-icon>{{ isMinimized ? 'expand_more' : 'expand_less' }}</mat-icon>
       </button>
     </div>

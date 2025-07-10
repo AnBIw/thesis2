@@ -31,7 +31,7 @@ export class UploadDocumentComponent {
   age: string = '';
   status: string = '';
   description: string = '';
-  isMinimized = false;
+  isMinimized = true; // Comienza minimizado
 
   @Output() documentUploaded = new EventEmitter<void>();
 

@@ -27,6 +27,20 @@ export class User extends Document {
     }], default: []
   })
   topics: any[];
+
+  @Prop({
+    type: [{
+      title: String,
+      description: String,
+      studentName: String,
+      justification: String,
+      status: { type: String, enum: ['pending', 'pre-selected', 'approved', 'rejected'], default: 'pending' },
+      preselectionComment: String,
+      createdAt: { type: Date, default: Date.now },
+      updatedAt: { type: Date, default: Date.now }
+    }], default: []
+  })
+  proposedTopics: any[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

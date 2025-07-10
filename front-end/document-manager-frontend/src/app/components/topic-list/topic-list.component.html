@@ -1,84 +1,258 @@
 <div class="contenedor">
   <mat-card>
     <mat-card-content>
-      <h3>Lista de Temas de Tesis por Profesor</h3>
-      <div *ngFor="let professor of professors">
+      <h3>
+        <span *ngIf="userRole === 'professor'">Mis Temas de Tesis</span>
+        <span *ngIf="userRole === 'students'">Lista de Temas de Tesis por Profesor</span>
+        <span *ngIf="userRole === 'admin'">Gestión de Temas de Tesis</span>
+        <span *ngIf="userRole === 'students'" style="font-size: 0.7em; color: #666; margin-left: 20px;">
+          Mis propuestas totales: {{ getTotalProposalCount() }}/3
+          <span *ngIf="!canProposeMore()" style="color: #f44336; font-weight: bold;">
+            (Límite alcanzado)
+          </span>
+        </span>
+      </h3>
+      <div *ngFor="let professor of getFilteredAndSortedProfessors()">
         <!-- Información del Profesor -->
-        <mat-card class="professor-card" >
+        <mat-card class="professor-card" [ngClass]="{'current-professor': userRole === 'professor' && userName === professor.name}">
           <mat-card-header>
-            <mat-card-title >{{ professor.name }}</mat-card-title>
-          <mat-card-subtitle>
-            <ng-container *ngFor="let spec of professor.specialty.split(','); let last = last">
-              <span style="display: block; margin-left: 60px; font-size: 0.95em; font-weight: normal; ">
-                {{ spec.trim() }}
-              </span>
-            </ng-container>
-          </mat-card-subtitle>
+            <mat-card-title>
+              {{ professor.name }}
+            </mat-card-title>
+            <mat-card-subtitle>
+              <div class="specialties-container">
+                <mat-icon class="specialties-icon">school</mat-icon>
+                <div class="specialties-list">
+                  <ng-container *ngFor="let spec of professor.specialty.split(','); let last = last">
+                    <span class="specialty-tag">{{ spec.trim() }}</span>
+                  </ng-container>
+                </div>
+              </div>
+            </mat-card-subtitle>
           </mat-card-header>
         </mat-card>
 
-        <!-- Tabla de Temas de Tesis -->
-        <table mat-table [dataSource]="getTopicsByProfessor(professor.name)" class="mat-elevation-z8 thesis-table" >
+        <!-- Tabla de Temas de Tesis y Propuestas -->
+        <table mat-table [dataSource]="getCombinedTopicsByProfessor(professor.name)"
+          class="mat-elevation-z8 thesis-table">
           <!-- Título Column -->
           <ng-container matColumnDef="title">
             <th mat-header-cell *matHeaderCellDef> Título </th>
-            <td mat-cell *matCellDef="let topic"> {{ topic.title }} </td>
+            <td mat-cell *matCellDef="let topic" [ngClass]="{'proposal-row': topic.isProposal, 'official-topic-row': !topic.isProposal}">
+              <div class="title-content">
+                <mat-icon *ngIf="topic.isProposal" class="proposal-icon">
+                  {{ canViewProposalDetails(topic.proposedToProfessor || professor.name) ? 'lightbulb' : 'lock' }}
+                </mat-icon>
+                <span class="title-text">{{ topic.title }}</span>
+                <mat-icon
+                  *ngIf="topic.isProposal && !canViewProposalDetails(topic.proposedToProfessor || professor.name)"
+                  class="privacy-icon">
+                  visibility_off
+                </mat-icon>
+              </div>
+            </td>
           </ng-container>
 
           <!-- Descripción Column -->
           <ng-container matColumnDef="description">
             <th mat-header-cell *matHeaderCellDef> Descripción </th>
-            <td mat-cell *matCellDef="let topic"> {{ topic.description }} </td>
+            <td mat-cell *matCellDef="let topic" [ngClass]="{'proposal-row': topic.isProposal, 'official-topic-row': !topic.isProposal}">
+              <div class="description-content">
+                <span
+                  [style.font-style]="topic.isProposal && !canViewProposalDetails(topic.proposedToProfessor || professor.name) ? 'italic' : 'normal'"
+                  [style.color]="topic.isProposal && !canViewProposalDetails(topic.proposedToProfessor || professor.name) ? '#666' : 'inherit'">
+                  {{ topic.description }}
+                </span>
+              </div>
+            </td>
           </ng-container>
 
-          <!-- Cupos Column -->
+          <!-- Cupos/Estado Column -->
           <ng-container matColumnDef="avaliableSlots">
-            <th mat-header-cell *matHeaderCellDef > Cupos </th>
-            <td mat-cell *matCellDef="let topic"> {{ topic.avaliableSlots }} </td>
-          </ng-container>
-
-          <!-- Inscritos Column -->
-          <ng-container matColumnDef="enrollStudent">
-            <th mat-header-cell *matHeaderCellDef> Estudiantes Inscritos</th>
-            <td mat-cell *matCellDef="let topic" [ngClass]="{'inscrito': isUserEnrolled(topic)}">
-                  <strong style="color:#1976d2;">({{ topic.enrolledStudents?.length || 0 }})</strong>
-              <ng-container  *ngFor="let student of topic.enrolledStudents; let last = last">
-                <div class="student-entry" >
-                  <span class="student-email" >{{ student.split(',')[0] }}</span>
+            <th mat-header-cell *matHeaderCellDef class="compact-header"> Cupos/Estado </th>
+            <td mat-cell *matCellDef="let topic" [ngClass]="{'proposal-row': topic.isProposal, 'official-topic-row': !topic.isProposal}" class="compact-cell">
+              <div class="status-content">
+                <span *ngIf="!topic.isProposal" class="slots-number">{{ topic.avaliableSlots }}</span>
+                
+                <!-- Para propuestas: mostrar icono si está aprobada/rechazada, texto si está pendiente/preseleccionada -->
+                <div *ngIf="topic.isProposal" class="proposal-status">
+                  <!-- Solo icono para aprobadas/rechazadas -->
+                  <mat-icon *ngIf="topic.status === 'approved'" 
+                            class="status-icon approved-icon" 
+                            title="Aprobada">
+                    check_circle
+                  </mat-icon>
+                  <mat-icon *ngIf="topic.status === 'rejected'" 
+                            class="status-icon rejected-icon" 
+                            title="Rechazada">
+                    cancel
+                  </mat-icon>
+                  
+                  <!-- Texto para pendientes/preseleccionadas -->
+                  <span *ngIf="topic.status === 'pending' || topic.status === 'pre-selected'" 
+                        [ngClass]="getStatusBadgeClass(topic.status)">
+                    {{ getStatusText(topic.status) }}
+                  </span>
                 </div>
-              <div *ngIf="!last"  class="student-separator">---</div>
-            </ng-container>
-          </td>
+              </div>
+            </td>
+          </ng-container>
+          <!-- Inscritos/Propuesto por Column -->
+          <ng-container matColumnDef="enrollStudent">
+            <th mat-header-cell *matHeaderCellDef> Estudiantes/Propuesto por</th>
+            <td mat-cell *matCellDef="let topic"
+              [ngClass]="{'inscrito': isUserEnrolled(topic), 'proposal-row': topic.isProposal, 'official-topic-row': !topic.isProposal}">
+              <!-- Para temas oficiales -->
+              <div *ngIf="!topic.isProposal" class="enrolled-students-container">
+                <div class="students-header">
+                  <mat-icon class="students-icon">groups</mat-icon>
+                  <span class="students-count">({{ topic.enrolledStudents?.length || 0 }})</span>
+                </div>
+                <div class="students-list" *ngIf="topic.enrolledStudents?.length > 0">
+                  <ng-container *ngFor="let student of topic.enrolledStudents; let i = index">
+                    <div class="student-card">
+                      <span class="student-email" 
+                            [ngClass]="{'clickable-email': userRole === 'professor'}"
+                            (click)="userRole === 'professor' ? openEmailClient(student.split(',')[0], topic) : null"
+                            [title]="userRole === 'professor' ? 'Enviar email a ' + student.split(',')[0] : student.split(',')[0]">
+                        {{ student.split(',')[0] }}
+                      </span>
+                    </div>
+                  </ng-container>
+                </div>
+                <div class="no-students" *ngIf="!topic.enrolledStudents?.length">
+                  <mat-icon>person_outline</mat-icon>
+                  <span>Sin inscripciones</span>
+                </div>
+              </div>
+
+              <!-- Para propuestas -->
+              <div *ngIf="topic.isProposal" class="proposal-content">
+                <mat-icon style="color: #4a8c5e; margin-bottom: 4px;">person</mat-icon>
+                <span style="font-size: 0.85em; color: #666;">Propuesto por:</span>
+                <span style="font-weight: 500;">{{ topic.studentName }}</span>
+              </div>
+            </td>
           </ng-container>
 
-          <!-- Botón de Borrar -->
+          <!-- Botones de Acción -->
           <ng-container matColumnDef="actions">
             <th mat-header-cell *matHeaderCellDef> Acciones </th>
-            <td mat-cell *matCellDef="let topic">
-              <button 
-                mat-icon-button
-                *ngIf="userRole === 'professor' || userRole === 'admin'"
-                (click)="deleteTopic(topic.title)">
-                <mat-icon>delete</mat-icon>
-              </button>
-              <button 
-              mat-icon-button
-              *ngIf="userRole === 'students'"
-              (click)="enrollStudent(topic.title)">
-              <mat-icon>person_add</mat-icon>
-              </button>
-              <button
-              mat-icon-button
-              *ngIf="userRole === 'students'"
-              (click)="unsubscribeStudent(topic.title)">
-                <mat-icon>person_remove</mat-icon>
-              </button>
-              </td>
+            <td mat-cell *matCellDef="let topic" [ngClass]="{'proposal-row': topic.isProposal, 'official-topic-row': !topic.isProposal}">
+              <!-- Acciones para temas oficiales -->
+              <div *ngIf="!topic.isProposal">
+                <button mat-icon-button *ngIf="(userRole === 'professor' && userName === topic.professor) || userRole === 'admin'"
+                  (click)="deleteTopic(topic.title)"
+                  title="Eliminar tema">
+                  <mat-icon>delete</mat-icon>
+                </button>
+                <button mat-icon-button *ngIf="userRole === 'students'" (click)="enrollStudent(topic.title)">
+                  <mat-icon>person_add</mat-icon>
+                </button>
+                <button mat-icon-button *ngIf="userRole === 'students'" (click)="unsubscribeStudent(topic.title)">
+                  <mat-icon>person_remove</mat-icon>
+                </button>
+              </div>
+
+              <!-- Acciones para propuestas -->
+              <div *ngIf="topic.isProposal && topic.status === 'pending'" class="action-buttons">
+                <!-- Botón Ver Detalles (solo para el profesor destinatario) -->
+                <button mat-icon-button color="accent"
+                  *ngIf="userRole === 'professor' && userName === topic.proposedToProfessor"
+                  (click)="showProposalDetails(topic)" title="Ver Detalles">
+                  <mat-icon>remove_red_eye</mat-icon>
+                </button>
+
+                <!-- Botón Preseleccionar -->
+                <button mat-icon-button color="primary"
+                  *ngIf="userRole === 'professor' && userName === topic.proposedToProfessor"
+                  (click)="preselectProposal(topic.proposalId)" title="Preseleccionar">
+                  <mat-icon>star_border</mat-icon>
+                </button>
+
+                <!-- Solo el profesor puede aprobar/rechazar sus propuestas -->
+                <button mat-icon-button color="primary"
+                  *ngIf="userRole === 'professor' && userName === topic.proposedToProfessor"
+                  (click)="approveProposal(topic.proposalId)" title="Aprobar">
+                  <mat-icon>check</mat-icon>
+                </button>
+                <button mat-icon-button color="warn"
+                  *ngIf="userRole === 'professor' && userName === topic.proposedToProfessor"
+                  (click)="rejectProposal(topic.proposalId)" title="Rechazar">
+                  <mat-icon>close</mat-icon>
+                </button>
+
+                <!-- Botón Eliminar (solo para el estudiante que propuso) -->
+                <button mat-icon-button color="warn"
+                  *ngIf="userRole === 'students' && userName === topic.studentName"
+                  (click)="deleteProposal(topic.proposalId)" title="Eliminar mi propuesta">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+
+              <!-- Acciones para propuestas preseleccionadas -->
+              <div *ngIf="topic.isProposal && topic.status === 'pre-selected'"
+                style="display: flex; align-items: center; justify-content: flex-start;">
+                <!-- Botón Ver Detalles -->
+                <button mat-icon-button color="accent"
+                  *ngIf="userRole === 'professor' && userName === topic.proposedToProfessor"
+                  (click)="showProposalDetails(topic)" title="Ver Detalles">
+                  <mat-icon>remove_red_eye</mat-icon>
+                </button>
+
+                <!-- Solo el profesor puede aprobar/rechazar propuestas preseleccionadas -->
+                <button mat-icon-button color="primary"
+                  *ngIf="userRole === 'professor' && userName === topic.proposedToProfessor"
+                  (click)="approveProposal(topic.proposalId)" title="Aprobar">
+                  <mat-icon>check</mat-icon>
+                </button>
+                <button mat-icon-button color="warn"
+                  *ngIf="userRole === 'professor' && userName === topic.proposedToProfessor"
+                  (click)="rejectProposal(topic.proposalId)" title="Rechazar">
+                  <mat-icon>close</mat-icon>
+                </button>
+              </div>
+
+              <!-- Estado para propuestas ya procesadas -->
+              <div *ngIf="topic.isProposal && (topic.status === 'approved' || topic.status === 'rejected')" 
+                   class="processed-proposal-container">
+                <div class="status-display">
+                  <!-- Badge clickeable para profesores -->
+                  <span *ngIf="userRole === 'professor' && userName === topic.proposedToProfessor"
+                        [ngClass]="getStatusBadgeClass(topic.status)"
+                        class="clickable-status"
+                        (click)="toggleProposalStatus(topic.proposalId, topic.status)"
+                        [title]="'Clic para cambiar a ' + (topic.status === 'approved' ? 'Rechazada' : 'Aprobada')">
+                    {{ getStatusText(topic.status) }}
+                    <mat-icon class="change-icon">sync</mat-icon>
+                  </span>
+                  
+                  <!-- Badge no clickeable para otros usuarios -->
+                  <span *ngIf="userRole !== 'professor' || userName !== topic.proposedToProfessor"
+                        [ngClass]="getStatusBadgeClass(topic.status)">
+                    {{ getStatusText(topic.status) }}
+                  </span>
+                  
+                  <!-- Botón de confirmación para el estudiante -->
+                  <button mat-raised-button 
+                          *ngIf="userRole === 'students' && userName === topic.studentName"
+                          (click)="confirmProposalViewed(topic.proposalId)"
+                          [color]="topic.status === 'approved' ? 'primary' : 'warn'"
+                          class="confirm-button"
+                          title="Confirmar que he visto el estado de mi propuesta">
+                    <mat-icon>visibility</mat-icon>
+                    He visto
+                  </button>
+                </div>
+              </div>
+            </td>
           </ng-container>
 
           <!-- Header and Row Definitions -->
-          <tr mat-header-row *matHeaderRowDef="['title', 'description', 'avaliableSlots', 'enrollStudent', 'actions']"></tr>
-          <tr mat-row *matRowDef="let row; columns: ['title', 'description', 'avaliableSlots', 'enrollStudent', 'actions'];"></tr>
+          <tr mat-header-row *matHeaderRowDef="['title', 'description', 'avaliableSlots', 'enrollStudent', 'actions']">
+          </tr>
+          <tr mat-row
+            *matRowDef="let row; columns: ['title', 'description', 'avaliableSlots', 'enrollStudent', 'actions'];"></tr>
         </table>
       </div>
     </mat-card-content>

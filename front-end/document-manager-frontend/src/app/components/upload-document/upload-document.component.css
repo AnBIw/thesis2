@@ -1,22 +1,68 @@
 .upload-card {
   max-width: 800px;
-  margin: 0 auto ;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  margin: 0 auto;
+  margin-bottom: 16px;
+  background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+  border-radius: 12px;
+  border: 2px solid #2196f3;
+  box-shadow: 0 4px 12px rgba(33, 150, 243, 0.2);
+  transition: all 0.3s ease;
+}
+
+.upload-card:hover {
+  box-shadow: 0 6px 16px rgba(33, 150, 243, 0.3);
+  transform: translateY(-2px);
+}
+
+.upload-card.minimized {
+  background: linear-gradient(135deg, #f3f8ff, #e8f2ff);
+  padding: 8px 16px;
 }
 
 .upload-form {
   gap: 18px;
+  display: flex;
+  flex-direction: column;
 }
 
 .file-input {
-  margin-bottom: 10px;
+  margin-bottom: 16px;
+  padding: 12px;
+  border: 2px dashed #2196f3;
+  border-radius: 8px;
+  background-color: rgba(33, 150, 243, 0.05);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.file-input:hover {
+  background-color: rgba(33, 150, 243, 0.1);
+  border-color: #1976d2;
 }
 
 .full-width {
   width: 100%;
 }
+
 mat-card-title {
-  color: #1a237e;
+  color: #0d47a1;
   font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+mat-card-title::before {
+  content: "📄";
+  font-size: 1.2em;
+}
+
+/* Estilo para título minimizado */
+.upload-card.minimized mat-card-title {
+  font-size: 1.1rem;
+}
+
+.upload-card.minimized mat-card-title::before {
+  content: "📁";
 }
 

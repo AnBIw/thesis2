@@ -27,12 +27,13 @@ import { ThesisTopic } from '../../models/thesis-topic.model';
   styleUrls: ['./add-topic-form.component.css'],
 })
 export class AddTopicFormComponent {
-  isMinimized = false;
+  isMinimized = true; // Comienza minimizado
 
   toggleMinimize() {
     this.isMinimized = !this.isMinimized;
   }
-  professorName: string = localStorage.getItem('name') || ''; 
+  
+  professorName: string = localStorage.getItem('name') || 'Profesor';
   thesisTopics: ThesisTopic[] = [];
   newTopic: ThesisTopic = {
     id: '',

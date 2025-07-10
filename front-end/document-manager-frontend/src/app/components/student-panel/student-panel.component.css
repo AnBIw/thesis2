@@ -1,34 +1,66 @@
-.student-greeting {
-  font-size: 1.2em;
+.student-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  border-radius: 12px;
   margin-bottom: 16px;
-  text-align: center;
-  color: #000000;
-  border-radius: 10px;
-  padding: 16px 0;
-  box-shadow: 0 2px 8px rgba(26,35,126,0.08);
-  font-weight: bold;
-  max-width: 600px;
-  margin-left: auto;
-  margin-right: auto;
+  box-shadow: 0 3px 10px rgba(26, 35, 126, 0.1);
+}
+
+.student-greeting-section {
   flex: 1;
-  text-align: center;
+}
+
+.student-greeting {
+  font-size: 1.6rem;
+  margin: 0 0 4px 0;
   color: #1a237e;
-  font-weight: bold;
-  font-size: 2rem;
-  margin-top: 4px;
+  font-weight: 700;
+  text-shadow: 0 1px 2px rgba(26, 35, 126, 0.1);
+}
+
+.student-subtitle {
+  font-size: 0.9rem;
+  margin: 0;
+  color: #424242;
+  font-weight: 500;
+  opacity: 0.8;
+}
+
+.propose-btn {
+  padding: 10px 20px !important;
+  font-size: 0.9rem !important;
+  font-weight: 600 !important;
+  border-radius: 25px !important;
+  background: #4caf50 !important;
+  color: white !important;
+  box-shadow: 0 3px 10px rgba(76, 175, 80, 0.3) !important;
+  transition: all 0.3s ease !important;
+}
+
+.propose-btn:hover {
+  background: #388e3c !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4) !important;
+}
+
+.propose-btn mat-icon {
+  margin-right: 6px;
 }
 
 .container {
-  background-color: rgba(255, 255, 255, 0.25); /* Blanco con 25% opacidad */
+  background-color: rgba(248, 249, 250, 0.7);
   display: flex;
   justify-content: space-between;
   gap: 20px;
 }
 
 .column {
-  background-color: rgba(255, 255, 255, 0.7); /* Blanco con 25% opacidad */
+  background-color: rgba(255, 255, 255, 0.85);
   flex: 1;
-  max-height: 85vh;    /* Ajusta la altura máxima según tu diseño */
+  max-height: 85vh;
   overflow-y: auto;
-  min-width: 0;        /* Para evitar desbordes en flexbox */
+  min-width: 0;
 }
