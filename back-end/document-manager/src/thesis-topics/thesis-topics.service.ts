@@ -28,6 +28,7 @@ export class ThesisTopicsService {
       description: newTopic.description,
       avaliableSlots: newTopic.avaliableSlots,
       enrolledStudents: newTopic.enrolledStudents,
+      registrationOpen: true, // Por defecto, las inscripciones están abiertas
     });
     await user.save();
     return newTopic;
@@ -58,6 +59,11 @@ export class ThesisTopicsService {
     for (const user of users) {
       const userTopic = user.topics.find((t: any) => t.title === title);
       if (userTopic) {
+        // Verificar si las inscripciones están abiertas
+        if (userTopic.registrationOpen === false) {
+          throw new BadRequestException('Las inscripciones para este tema están cerradas');
+        }
+
         if (userTopic.enrolledStudents.includes(email)) {
           throw new BadRequestException('El estudiante ya está inscrito en este tema');
         }
@@ -203,7 +209,7 @@ export class ThesisTopicsService {
     return foundProposal;
   }
 
-  async updateProposalStatus(proposalId: string, status: 'approved' | 'rejected'): Promise<any> {
+  async updateProposalStatus(proposalId: string, status: 'pending' | 'pre-selected' | 'approved' | 'rejected'): Promise<any> {
     // Buscar la propuesta en todos los profesores
     const professors = await this.userModel.find({ role: 'professor' }).exec();
     let foundProposal: any = null;
@@ -224,20 +230,50 @@ export class ThesisTopicsService {
       throw new NotFoundException('Propuesta no encontrada');
     }
 
+    const previousStatus = foundProposal.status;
     foundProposal.status = status;
     foundProposal.updatedAt = new Date();
 
     // Si la propuesta es aprobada, convertirla en un tema oficial
     if (status === 'approved') {
-      const newTopic = {
-        title: foundProposal.title,
-        description: foundProposal.description,
-        avaliableSlots: 1, // Por defecto, un cupo disponible
-        enrolledStudents: [foundProposal.studentName], // El estudiante que propuso ya está inscrito
-      };
+      // Verificar si ya existe un tema con este título para evitar duplicados
+      const existingTopic = foundProfessor.topics.find((topic: any) => 
+        topic.title.trim().toLowerCase() === foundProposal.title.trim().toLowerCase()
+      );
 
-      foundProfessor.topics.push(newTopic);
-      console.log('Propuesta aprobada y convertida en tema oficial:', newTopic);
+      if (!existingTopic) {
+        const newTopic = {
+          title: foundProposal.title,
+          description: foundProposal.description,
+          avaliableSlots: 1, // Por defecto, un cupo disponible
+          enrolledStudents: [foundProposal.studentName], // El estudiante que propuso ya está inscrito
+          registrationOpen: true, // Por defecto, las inscripciones están abiertas
+        };
+
+        foundProfessor.topics.push(newTopic);
+        console.log('Propuesta aprobada y convertida en tema oficial:', newTopic);
+      }
+    }
+
+    // Si la propuesta cambia de aprobada a cualquier otro estado, eliminar el tema oficial correspondiente
+    if (previousStatus === 'approved' && status !== 'approved') {
+      const topicIndex = foundProfessor.topics.findIndex((topic: any) => 
+        topic.title.trim().toLowerCase() === foundProposal.title.trim().toLowerCase()
+      );
+
+      if (topicIndex !== -1) {
+        foundProfessor.topics.splice(topicIndex, 1);
+        console.log('Tema oficial eliminado al cambiar propuesta de aprobada a:', status, foundProposal.title);
+
+        // También limpiar la tesis actual del estudiante si tenía este tema asignado
+        const student = await this.userModel.findOne({ name: foundProposal.studentName });
+        if (student && student.tesisActual && 
+            student.tesisActual.titulo.trim().toLowerCase() === foundProposal.title.trim().toLowerCase()) {
+          student.tesisActual = null;
+          await student.save();
+          console.log('Tesis actual del estudiante limpiada:', foundProposal.studentName);
+        }
+      }
     }
 
     await foundProfessor.save();
@@ -266,5 +302,91 @@ export class ThesisTopicsService {
     if (!found) {
       throw new NotFoundException('Propuesta no encontrada');
     }
+  }
+
+  // Métodos para gestionar la tesis actual del estudiante
+  async updateStudentTesisActual(studentName: string, tesisData: any): Promise<any> {
+    const student = await this.userModel.findOne({ name: studentName });
+    if (!student) {
+      throw new NotFoundException('Estudiante no encontrado');
+    }
+
+    student.tesisActual = {
+      titulo: tesisData.titulo,
+      descripcion: tesisData.descripcion,
+      profesor: tesisData.profesor,
+      estado: tesisData.estado || 'aprobado',
+      fechaAsignacion: new Date()
+    };
+
+    await student.save();
+    console.log(`Tesis actual actualizada para estudiante ${studentName}:`, student.tesisActual);
+    return student.tesisActual;
+  }
+
+  async getStudentTesisActual(studentName: string): Promise<any> {
+    const student = await this.userModel.findOne({ name: studentName });
+    if (!student) {
+      throw new NotFoundException('Estudiante no encontrado');
+    }
+
+    return student.tesisActual || null;
+  }
+
+  async clearStudentTesisActual(studentName: string): Promise<void> {
+    const student = await this.userModel.findOne({ name: studentName });
+    if (!student) {
+      throw new NotFoundException('Estudiante no encontrado');
+    }
+
+    student.tesisActual = null;
+    await student.save();
+    console.log(`Tesis actual limpiada para estudiante ${studentName}`);
+  }
+
+  async getStudentPreselectedProposals(studentName: string): Promise<any[]> {
+    // Buscar todas las propuestas preseleccionadas del estudiante
+    const professors = await this.userModel.find({ role: 'professor' }).exec();
+    const preselectedProposals: any[] = [];
+
+    for (const professor of professors) {
+      if (professor.proposedTopics) {
+        const studentProposals = professor.proposedTopics.filter((p: any) => 
+          p.studentName === studentName && 
+          p.status === 'pre-selected' && 
+          p.preselectionComment
+        );
+        
+        // Agregar el nombre del profesor a cada propuesta
+        const proposalsWithProfessor = studentProposals.map(proposal => ({
+          ...proposal.toObject(),
+          proposedToProfessor: professor.name,
+          _id: proposal._id
+        }));
+        
+        preselectedProposals.push(...proposalsWithProfessor);
+      }
+    }
+
+    return preselectedProposals;
+  }
+
+  // Controlar inscripciones de temas oficiales
+  async toggleTopicRegistration(professorName: string, topicTitle: string, registrationOpen: boolean): Promise<any> {
+    const professor = await this.userModel.findOne({ name: professorName, role: 'professor' });
+    if (!professor) {
+      throw new NotFoundException('Profesor no encontrado');
+    }
+
+    const topic = professor.topics.find((t: any) => t.title === topicTitle);
+    if (!topic) {
+      throw new NotFoundException('Tema no encontrado');
+    }
+
+    topic.registrationOpen = registrationOpen;
+    await professor.save();
+
+    console.log(`Inscripciones para "${topicTitle}" ${registrationOpen ? 'abiertas' : 'cerradas'} por ${professorName}`);
+    return topic;
   }
 }

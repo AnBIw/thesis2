@@ -6,3 +6,16 @@ body {
     font-family: Roboto, "Helvetica Neue", sans-serif; 
     background-color: #000000; /* Elige el color que prefieras */
 }
+
+/* Estilos globales para notificaciones de preselección */
+.preselection-notification {
+    background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%) !important;
+    color: white !important;
+    font-weight: 500 !important;
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3) !important;
+}
+
+.preselection-notification .mat-snack-bar-action {
+    color: #e8f5e8 !important;
+    font-weight: 600 !important;
+}

@@ -74,6 +74,7 @@ export class LoginController {
       description: topic.description,
       avaliableSlots: topic.avaliableSlots,
       enrolledStudents: topic.enrolledStudents,
+      registrationOpen: topic.registrationOpen !== false, // Por defecto true si no está definido
       professor: profesor.find(prof => prof.topics.some(t => t.title === topic.title))?.name || 'Unknown',
     }));
   }

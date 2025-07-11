@@ -23,7 +23,8 @@ export class User extends Document {
       title: String,
       description: String,
       avaliableSlots: Number,
-      enrolledStudents: [String]
+      enrolledStudents: [String],
+      registrationOpen: { type: Boolean, default: true } // Nuevo campo para controlar inscripciones
     }], default: []
   })
   topics: any[];
@@ -41,6 +42,18 @@ export class User extends Document {
     }], default: []
   })
   proposedTopics: any[];
+
+  @Prop({
+    type: {
+      titulo: String,
+      descripcion: String,
+      profesor: String,
+      estado: { type: String, enum: ['aprobado', 'en_proceso'], default: 'aprobado' },
+      fechaAsignacion: { type: Date, default: Date.now }
+    },
+    default: null
+  })
+  tesisActual: any;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

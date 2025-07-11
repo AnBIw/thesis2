@@ -66,7 +66,7 @@ export class ThesisTopicsController {
   @Patch('proposals/:id')
   async updateProposalStatus(
     @Param('id') id: string,
-    @Body('status') status: 'approved' | 'rejected',
+    @Body('status') status: 'pending' | 'pre-selected' | 'approved' | 'rejected',
   ): Promise<any> {
     return await this.thesisTopicsService.updateProposalStatus(id, status);
   }
@@ -74,5 +74,38 @@ export class ThesisTopicsController {
   @Delete('proposals/:id')
   async deleteProposal(@Param('id') id: string): Promise<void> {
     await this.thesisTopicsService.deleteProposal(id);
+  }
+
+  // Endpoints para gestionar la tesis actual del estudiante
+  @Patch('students/:studentName/tesis-actual')
+  async updateStudentTesisActual(
+    @Param('studentName') studentName: string,
+    @Body() tesisData: any,
+  ): Promise<any> {
+    return await this.thesisTopicsService.updateStudentTesisActual(studentName, tesisData);
+  }
+
+  @Get('students/:studentName/tesis-actual')
+  async getStudentTesisActual(@Param('studentName') studentName: string): Promise<any> {
+    return await this.thesisTopicsService.getStudentTesisActual(studentName);
+  }
+
+  @Delete('students/:studentName/tesis-actual')
+  async clearStudentTesisActual(@Param('studentName') studentName: string): Promise<void> {
+    await this.thesisTopicsService.clearStudentTesisActual(studentName);
+  }
+
+  @Get('students/:studentName/preselected-proposals')
+  async getStudentPreselectedProposals(@Param('studentName') studentName: string): Promise<any[]> {
+    return await this.thesisTopicsService.getStudentPreselectedProposals(studentName);
+  }
+
+  @Patch('topics/:topicTitle/registration')
+  async toggleTopicRegistration(
+    @Param('topicTitle') topicTitle: string,
+    @Body('professorName') professorName: string,
+    @Body('registrationOpen') registrationOpen: boolean,
+  ): Promise<any> {
+    return await this.thesisTopicsService.toggleTopicRegistration(professorName, topicTitle, registrationOpen);
   }
 }

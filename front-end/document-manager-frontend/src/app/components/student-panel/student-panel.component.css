@@ -18,7 +18,14 @@
   margin: 0 0 4px 0;
   color: #1a237e;
   font-weight: 700;
-  text-shadow: 0 1px 2px rgba(26, 35, 126, 0.1);
+}
+
+/* Estilos para notificaciones de preselección */
+.preselection-notification {
+  background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%) !important;
+  color: white !important;
+  font-weight: 500 !important;
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3) !important;
 }
 
 .student-subtitle {
@@ -63,4 +70,53 @@
   max-height: 85vh;
   overflow-y: auto;
   min-width: 0;
+}
+
+/* Estilos para el estado del tema de tesis */
+.thesis-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 8px 12px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(26, 35, 126, 0.1);
+}
+
+.status-assigned {
+  color: #2e7d32;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.status-pending {
+  color: #f57c00;
+  font-weight: 600;
+  font-size: 0.9rem;
+  font-style: italic;
+}
+
+.assigned-icon {
+  color: #4caf50 !important;
+  font-size: 20px !important;
+}
+
+.pending-icon {
+  color: #ff9800 !important;
+  font-size: 20px !important;
+}
+
+/* Botón deshabilitado cuando ya tiene tema */
+.propose-btn:disabled {
+  background: #bdbdbd !important;
+  color: #757575 !important;
+  cursor: not-allowed !important;
+  box-shadow: none !important;
+}
+
+.propose-btn:disabled:hover {
+  transform: none !important;
+  box-shadow: none !important;
 }

@@ -256,9 +256,7 @@ mat-card-content table {
 .title-content {
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: 8px;
-  flex-wrap: wrap;
 }
 
 .title-text {
@@ -473,6 +471,10 @@ mat-icon {
   color: #f44336 !important;
 }
 
+.preselected-icon {
+  color: #ff9800 !important;
+}
+
 /* Ajustar tamaño de badges para estados pendientes/preseleccionados */
 .status-pending,
 .status-preselected {
@@ -579,6 +581,9 @@ button[color="accent"] {
   flex-direction: column;
   gap: 8px;
   padding: 8px;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .students-header {
@@ -606,6 +611,8 @@ button[color="accent"] {
   gap: 4px;
   max-height: 120px;
   overflow-y: auto;
+  overflow-x: hidden;
+  width: 100%;
 }
 
 .student-card {
@@ -617,6 +624,9 @@ button[color="accent"] {
   border-radius: 8px;
   border-left: 3px solid #1976d2;
   transition: all 0.2s ease;
+  width: 100%;
+  box-sizing: border-box;
+  min-width: 0;
 }
 
 .student-card:hover {
@@ -634,9 +644,8 @@ button[color="accent"] {
   font-size: 0.8rem;
   color: #424242;
   font-weight: 500;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  word-break: break-word;
+  line-height: 1.2;
 }
 
 .no-students {
@@ -764,7 +773,122 @@ button[color="accent"] {
 }
 
 .status-rejected.clickable-status:hover {
-  background: linear-gradient(135deg, #f4fbf6, #d4e8d9) !important;
-  border-color: #73ca94 !important;
+  background: linear-gradient(135deg, #ffcdd2, #f8bbd9) !important;
+  border-color: #d32f2f !important;
+  color: #d32f2f !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(244, 67, 54, 0.4);
+  transition: all 0.3s ease;
+}
+
+/* Estilos para indicador de propuesta aprobada */
+.approved-proposal-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+@keyframes reject-pulse {
+  0% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.05); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* Estilos para el botón dentro del indicador de propuesta aprobada */
+.approved-proposal-indicator button {
+  margin: 0 !important;
+  padding: 4px !important;
+  min-width: auto !important;
+  background: rgba(244, 67, 54, 0.1) !important;
+  border: 1px solid rgba(244, 67, 54, 0.3) !important;
+  border-radius: 4px !important;
+  transition: all 0.3s ease !important;
+}
+
+.approved-proposal-indicator button:hover {
+  background: rgba(244, 67, 54, 0.2) !important;
+  border-color: #f44336 !important;
+  transform: scale(1.05) !important;
+}
+
+.approved-proposal-indicator button mat-icon {
+  font-size: 16px !important;
+  width: 16px !important;
+  height: 16px !important;
+  color: #b71c1c !important;
+}
+
+/* Estilos específicos para el botón de revertir */
+.revert-button {
+  color: #2d5e3a;
+  font-weight: bold;
+  background: linear-gradient(135deg, #f4fbf6, #d4e8d9);
+  padding: 6px 12px;
+  border-radius: 16px;
+  border: 1px solid #73ca94;
+  font-size: 0.85em;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 4px rgba(115, 202, 148, 0.2);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.revert-button:hover {
+  background: linear-gradient(135deg, #d4e8d9, #c8e6c8) !important;
+  border-color: #4caf50 !important;
   color: #2d5e3a !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(115, 202, 148, 0.4);
+}
+
+.revert-button:hover .change-icon {
+  opacity: 1;
+  animation: rotate 1s ease-in-out;
+}
+
+.revert-button mat-icon {
+  font-size: 16px !important;
+  width: 16px !important;
+  height: 16px !important;
+  color: #2d5e3a !important;
+}
+
+.revert-button .change-icon {
+  font-size: 14px !important;
+  width: 14px !important;
+  height: 14px !important;
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+}
+
+.title-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.lock-icon {
+  color: #d32f2f !important;
+  font-size: 20px !important;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.6; }
+  100% { opacity: 1; }
+}
+
+button[disabled] {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+}
+
+button[disabled] mat-icon {
+  color: #999 !important;
 }

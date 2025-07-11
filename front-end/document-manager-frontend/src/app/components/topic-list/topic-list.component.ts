@@ -10,7 +10,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { ThesisService } from '../../services/thesis.service';
 import { ThesisTopic } from '../../models/thesis-topic.model';
 import { MatTableModule } from '@angular/material/table'; 
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar'; 
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { TemaActualService } from '../../services/tema-actual.service';
 
 @Component({
   selector: 'topic-list',
@@ -41,7 +42,8 @@ export class TopicListComponent implements OnInit {
 
   constructor(
     private thesisService: ThesisService,
-    private snackBar: MatSnackBar 
+    private snackBar: MatSnackBar,
+    private temaActualService: TemaActualService
   ) { }
 
   ngOnInit(): void {
@@ -151,15 +153,70 @@ export class TopicListComponent implements OnInit {
     });
   }
 
+  /* 
+    Lógica de visualización de propuestas:
+    
+    - ESTUDIANTES: Ven todas las propuestas del profesor, EXCEPTO las aprobadas de otros estudiantes
+                  (las propuestas aprobadas propias las ven hasta que confirmen que las vieron)
+    
+    - PROFESORES/ADMINS: NO ven propuestas aprobadas porque estas se convierten automáticamente 
+                        en temas oficiales, evitando duplicación en la vista
+    
+    Flujo: Propuesta → Aprobada → Tema Oficial + Propuesta visible solo para el estudiante autor
+           → Estudiante confirma → Propuesta eliminada, solo queda Tema Oficial
+    */
+    
   // Método para combinar temas oficiales y propuestas por profesor
   getCombinedTopicsByProfessor(professorName: string): any[] {
     const officialTopics = this.thesisTopics.filter(topic => topic.professor === professorName);
-    const proposals = this.proposedTopics.filter(proposal => proposal.proposedToProfessor === professorName);
+    
+    // Filtrar propuestas según el rol del usuario
+    let proposals;
+    if (this.userRole === 'students') {
+      // Para estudiantes: mostrar todas las propuestas dirigidas al profesor
+      // Las propuestas aprobadas las verán solo si son suyas (para confirmar que las vieron)
+      proposals = this.proposedTopics.filter(proposal => {
+        if (proposal.proposedToProfessor !== professorName) return false;
+        
+        // Si es una propuesta aprobada, solo mostrarla si es del estudiante actual
+        if (proposal.status === 'approved') {
+          return proposal.studentName === this.userName;
+        }
+        
+        // Para otros estados, mostrar todas
+        return true;
+      });
+    } else {
+      // Para profesores y admins: NO mostrar propuestas aprobadas como propuestas separadas
+      // Las propuestas aprobadas se muestran integradas en los temas oficiales
+      proposals = this.proposedTopics.filter(proposal => 
+        proposal.proposedToProfessor === professorName && proposal.status !== 'approved'
+      );
+    }
+
+    // Para profesores: agregar información de propuestas aprobadas a los temas oficiales correspondientes
+    if (this.userRole === 'professor' || this.userRole === 'admin') {
+      const approvedProposals = this.proposedTopics.filter(proposal => 
+        proposal.proposedToProfessor === professorName && proposal.status === 'approved'
+      );
+
+      // Marcar temas oficiales que provienen de propuestas aprobadas
+      officialTopics.forEach(topic => {
+        const relatedProposal = approvedProposals.find(proposal => 
+          proposal.title.trim().toLowerCase() === topic.title.trim().toLowerCase()
+        );
+        if (relatedProposal) {
+          (topic as any).fromApprovedProposal = true;
+          (topic as any).originalProposalId = relatedProposal._id;
+          (topic as any).proposalStudentName = relatedProposal.studentName;
+        }
+      });
+    }
     
     // Mapear propuestas para que tengan la estructura correcta
     const mappedProposals = proposals.map(proposal => ({
-      title: this.canViewProposalDetails(proposal.proposedToProfessor) ? proposal.title : 'Propuesta Privada',
-      description: this.canViewProposalDetails(proposal.proposedToProfessor) ? proposal.description : 'Contenido privado - Solo visible para el profesor destinatario',
+      title: this.canViewProposalDetails(proposal.proposedToProfessor, proposal.studentName) ? proposal.title : 'Propuesta Privada',
+      description: this.canViewProposalDetails(proposal.proposedToProfessor, proposal.studentName) ? proposal.description : 'Contenido privado - Solo visible para participantes autorizados',
       avaliableSlots: proposal.status,
       enrolledStudents: [],
       studentName: proposal.studentName,
@@ -215,8 +272,24 @@ export class TopicListComponent implements OnInit {
   }
 
   // Verificar si el usuario actual puede ver los detalles de la propuesta
-  canViewProposalDetails(professorName: string): boolean {
-    return this.userRole === 'professor' && this.userName === professorName;
+  canViewProposalDetails(professorName: string, studentName?: string): boolean {
+    // Los administradores pueden ver todas las propuestas
+    if (this.userRole === 'admin') {
+      return true;
+    }
+    
+    // Todos los profesores pueden ver las propuestas (para evitar duplicados y permitir coordinación)
+    if (this.userRole === 'professor') {
+      return true;
+    }
+    
+    // El estudiante que emitió la propuesta puede verla
+    if (this.userRole === 'students' && studentName && this.userName === studentName) {
+      return true;
+    }
+    
+    // Otros estudiantes no pueden ver propuestas de otros
+    return false;
   }
 
   // Contar propuestas totales del estudiante actual
@@ -226,193 +299,232 @@ export class TopicListComponent implements OnInit {
     ).length;
   }
 
-  // Verificar si el estudiante puede proponer más temas
+  // Verificar si el estudiante puede hacer más propuestas
   canProposeMore(): boolean {
     return this.getTotalProposalCount() < 3;
   }
 
-  // Eliminar propuesta (solo para el estudiante que la propuso)
-  deleteProposal(proposalId: string): void {
-    if (confirm('¿Estás seguro que deseas eliminar esta propuesta?')) {
-      this.thesisService.deleteProposal(proposalId).subscribe({
-        next: () => {
-          this.snackBar.open('Propuesta eliminada correctamente', 'Cerrar', { duration: 3000 });
+  // Obtener profesores filtrados y ordenados
+  getFilteredAndSortedProfessors(): { name: string; specialty: string }[] {
+    // Si el usuario es profesor, poner su información primero
+    if (this.userRole === 'professor') {
+      const currentProfessor = this.professors.find(prof => prof.name === this.userName);
+      const otherProfessors = this.professors.filter(prof => prof.name !== this.userName);
+      
+      // Ordenar los otros profesores alfabéticamente
+      otherProfessors.sort((a, b) => a.name.localeCompare(b.name));
+      
+      // Retornar el profesor actual primero, seguido de los demás
+      return currentProfessor ? [currentProfessor, ...otherProfessors] : otherProfessors;
+    }
+    
+    // Para estudiantes y admin, ordenar alfabéticamente
+    return this.professors.sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  // Abrir cliente de email para contactar estudiante
+  openEmailClient(studentEmail: string, topic: any): void {
+    const subject = encodeURIComponent(`Tema de Tesis: ${topic.title}`);
+    const body = encodeURIComponent(`Hola,
+
+Me pongo en contacto contigo sobre el tema de tesis "${topic.title}".
+
+Saludos,
+${this.userName}`);
+    
+    const mailtoLink = `mailto:${studentEmail}?subject=${subject}&body=${body}`;
+    window.open(mailtoLink, '_blank');
+  }
+
+  // Revertir propuesta aprobada a estado pendiente
+  revertApprovedProposal(proposalId: string, topicTitle: string): void {
+    if (confirm(`¿Estás seguro de que quieres revertir el tema "${topicTitle}" a propuesta pendiente? Esto eliminará el tema oficial y permitirá revisar nuevamente la propuesta.`)) {
+      this.thesisService.changeProposalStatus(proposalId, 'pending').subscribe({
+        next: (response) => {
+          this.snackBar.open('Propuesta revertida exitosamente a estado pendiente', 'Cerrar', {
+            duration: 3000
+          });
+          
+          // Recargar ambas listas para reflejar los cambios
+          this.loadThesisTopics();
           this.loadProposedTopics();
         },
         error: (error) => {
-          console.error('Error al eliminar propuesta', error);
-          this.snackBar.open('Error al eliminar propuesta', 'Cerrar', { duration: 3000 });
-        },
+          console.error('Error al revertir la propuesta:', error);
+          this.snackBar.open('Error al revertir la propuesta', 'Cerrar', {
+            duration: 3000
+          });
+        }
       });
     }
   }
 
-  // Preseleccionar propuesta
-  preselectProposal(proposalId: string): void {
-    const comment = prompt('Comentario sobre la preselección (opcional):');
+  // Alternar el estado de inscripción de un tema
+  toggleRegistration(topic: any): void {
+    const newRegistrationState = !topic.registrationOpen;
+    const actionText = newRegistrationState ? 'abrir' : 'cerrar';
     
-    this.thesisService.preselectProposal(proposalId, comment || '').subscribe({
-      next: () => {
-        this.snackBar.open('Propuesta preseleccionada exitosamente', 'Cerrar', { duration: 3000 });
-        this.loadProposedTopics();
-      },
-      error: (error) => {
-        console.error('Error al preseleccionar propuesta', error);
-        this.snackBar.open('Error al preseleccionar propuesta', 'Cerrar', { duration: 3000 });
-      },
-    });
+    if (confirm(`¿Estás seguro de que quieres ${actionText} las inscripciones para el tema "${topic.title}"?`)) {
+      this.thesisService.toggleTopicRegistration(topic.title, this.userName, newRegistrationState).subscribe({
+        next: (response) => {
+          this.snackBar.open(`Inscripciones ${newRegistrationState ? 'abiertas' : 'cerradas'} exitosamente`, 'Cerrar', {
+            duration: 3000
+          });
+          
+          // Recargar la lista para reflejar los cambios
+          this.loadThesisTopics();
+        },
+        error: (error) => {
+          console.error('Error al cambiar el estado de inscripción:', error);
+          this.snackBar.open('Error al cambiar el estado de inscripción', 'Cerrar', {
+            duration: 3000
+          });
+        }
+      });
+    }
   }
 
-  // Aprobar propuesta
-  approveProposal(proposalId: string): void {
-    this.thesisService.updateProposalStatus(proposalId, 'approved').subscribe({
-      next: () => {
-        this.snackBar.open('Propuesta aprobada exitosamente', 'Cerrar', { duration: 3000 });
-        this.loadProposedTopics();
-        this.loadThesisTopics(); // Recargar temas porque se creará uno nuevo
-      },
-      error: (error) => {
-        console.error('Error al aprobar propuesta', error);
-        this.snackBar.open('Error al aprobar propuesta', 'Cerrar', { duration: 3000 });
-      },
-    });
-  }
-
-  // Rechazar propuesta
-  rejectProposal(proposalId: string): void {
-    this.thesisService.updateProposalStatus(proposalId, 'rejected').subscribe({
-      next: () => {
-        this.snackBar.open('Propuesta rechazada', 'Cerrar', { duration: 3000 });
-        this.loadProposedTopics();
-      },
-      error: (error) => {
-        console.error('Error al rechazar propuesta', error);
-        this.snackBar.open('Error al rechazar propuesta', 'Cerrar', { duration: 3000 });
-      },
-    });
-  }
-
-  // Mostrar detalles completos de la propuesta (solo para el profesor destinatario)
+  // Mostrar detalles de una propuesta
   showProposalDetails(proposal: any): void {
-    if (!this.canViewProposalDetails(proposal.proposedToProfessor)) {
-      this.snackBar.open('No tienes permisos para ver los detalles de esta propuesta', 'Cerrar', { duration: 3000 });
-      return;
-    }
+    const details = `
+Título: ${proposal.title}
 
-    // Incluir comentario de preselección si existe
-    let details = `
-Título: ${proposal.originalTitle}
-Descripción: ${proposal.originalDescription}
-Justificación: ${proposal.justification}
+Descripción: ${proposal.description}
+
+Justificación: ${proposal.justification || 'No proporcionada'}
+
 Propuesto por: ${proposal.studentName}
-Estado: ${this.getStatusText(proposal.status)}`;
 
-    if (proposal.preselectionComment && proposal.status === 'pre-selected') {
-      details += `
-Comentario de preselección: ${proposal.preselectionComment}`;
-    }
+Estado: ${this.getStatusText(proposal.status)}
 
-    alert(details); // Por simplicidad uso alert, pero podrías usar un modal más elegante
+${proposal.preselectionComment ? `Comentario del profesor: ${proposal.preselectionComment}` : ''}
+    `.trim();
+
+    // Usar alert simple para mostrar los detalles
+    // En una implementación más sofisticada, se podría usar un modal
+    alert(details);
   }
 
-  /**
-   * Abre el cliente de correo predeterminado para enviar un email al estudiante
-   * @param studentEmail - Email del estudiante
-   * @param topic - Información del tema de tesis
-   */
-  openEmailClient(studentEmail: string, topic: any): void {
-    const subject = encodeURIComponent('Consulta sobre Tema de Tesis');
-    const body = encodeURIComponent(`Estimado/a estudiante,
-
-IntegraTesis
-Espero que se encuentre bien. Me pongo en contacto con usted en relación al tema de tesis en el que se encuentra inscrito/a.
-
-INFORMACIÓN DEL TEMA:
-Título: ${topic.title}
-Descripción: ${topic.description}
-Cupos disponibles: ${topic.avaliableSlots}
-Profesor: ${topic.professor || this.userName}
-
-[Escriba aquí su mensaje]
-
-Saludos cordiales,
-${this.userName}
-Profesor/a - Universidad Austral de Chile`);
-
-    const mailtoLink = `mailto:${studentEmail}?subject=${subject}&body=${body}`;
+  // Preseleccionar una propuesta
+  preselectProposal(proposalId: string): void {
+    const comment = prompt('Comentario para el estudiante (opcional):');
     
-    try {
-      window.open(mailtoLink, '_blank');
-    } catch (error) {
-      console.error('Error al abrir cliente de correo:', error);
-      // Fallback: copiar email al portapapeles
-      navigator.clipboard.writeText(studentEmail).then(() => {
-        this.snackBar.open(`Email copiado al portapapeles: ${studentEmail}`, 'Cerrar', {
+    this.thesisService.preselectProposal(proposalId, comment || undefined).subscribe({
+      next: (response) => {
+        this.snackBar.open('Propuesta preseleccionada exitosamente', 'Cerrar', {
           duration: 3000
         });
-      });
-    }
+        this.loadProposedTopics();
+      },
+      error: (error) => {
+        console.error('Error al preseleccionar propuesta:', error);
+        this.snackBar.open('Error al preseleccionar propuesta', 'Cerrar', {
+          duration: 3000
+        });
+      }
+    });
   }
 
-  // Confirmar que el estudiante vio el estado de su propuesta
-  confirmProposalViewed(proposalId: string): void {
-    const confirmMessage = '¿Confirmas que has visto el estado de tu propuesta? Esta acción eliminará la propuesta de la tabla.';
-    
-    if (confirm(confirmMessage)) {
-      this.thesisService.deleteProposal(proposalId).subscribe({
-        next: () => {
-          this.snackBar.open('Propuesta confirmada y eliminada de la vista', 'Cerrar', { duration: 3000 });
-          this.loadProposedTopics(); // Recargar para actualizar la vista
+  // Aprobar una propuesta
+  approveProposal(proposalId: string): void {
+    if (confirm('¿Estás seguro de que quieres aprobar esta propuesta? Se creará un tema oficial.')) {
+      this.thesisService.changeProposalStatus(proposalId, 'approved').subscribe({
+        next: (response) => {
+          this.snackBar.open('Propuesta aprobada exitosamente', 'Cerrar', {
+            duration: 3000
+          });
+          this.loadThesisTopics();
+          this.loadProposedTopics();
         },
         error: (error) => {
-          console.error('Error al confirmar propuesta vista', error);
-          this.snackBar.open('Error al procesar la confirmación', 'Cerrar', { duration: 3000 });
-        },
+          console.error('Error al aprobar propuesta:', error);
+          this.snackBar.open('Error al aprobar propuesta', 'Cerrar', {
+            duration: 3000
+          });
+        }
       });
     }
   }
 
-  // Filtrar y ordenar profesores según el rol del usuario
-  getFilteredAndSortedProfessors(): { name: string; specialty: string }[] {
-    let filteredProfessors = [...this.professors];
-
-    // Si es profesor, solo mostrar su información al inicio, luego los demás
-    if (this.userRole === 'professor') {
-      // Separar el profesor actual de los demás
-      const currentProfessor = filteredProfessors.filter(prof => prof.name === this.userName);
-      const otherProfessors = filteredProfessors.filter(prof => prof.name !== this.userName);
-      
-      // Retornar el profesor actual primero, luego los demás
-      return [...currentProfessor, ...otherProfessors];
+  // Rechazar una propuesta
+  rejectProposal(proposalId: string): void {
+    if (confirm('¿Estás seguro de que quieres rechazar esta propuesta?')) {
+      this.thesisService.changeProposalStatus(proposalId, 'rejected').subscribe({
+        next: (response) => {
+          this.snackBar.open('Propuesta rechazada', 'Cerrar', {
+            duration: 3000
+          });
+          this.loadProposedTopics();
+        },
+        error: (error) => {
+          console.error('Error al rechazar propuesta:', error);
+          this.snackBar.open('Error al rechazar propuesta', 'Cerrar', {
+            duration: 3000
+          });
+        }
+      });
     }
-
-    // Para estudiantes y administradores, mostrar todos los profesores
-    // pero con el profesor del usuario actual (si existe) al principio
-    if (this.userName) {
-      const currentProfessor = filteredProfessors.filter(prof => prof.name === this.userName);
-      const otherProfessors = filteredProfessors.filter(prof => prof.name !== this.userName);
-      return [...currentProfessor, ...otherProfessors];
-    }
-
-    return filteredProfessors;
   }
 
-  // Cambiar estado de propuesta ya procesada (para corregir errores)
+  // Eliminar una propuesta
+  deleteProposal(proposalId: string): void {
+    if (confirm('¿Estás seguro de que quieres eliminar esta propuesta?')) {
+      this.thesisService.deleteProposal(proposalId).subscribe({
+        next: (response) => {
+          this.snackBar.open('Propuesta eliminada exitosamente', 'Cerrar', {
+            duration: 3000
+          });
+          this.loadProposedTopics();
+        },
+        error: (error) => {
+          console.error('Error al eliminar propuesta:', error);
+          this.snackBar.open('Error al eliminar propuesta', 'Cerrar', {
+            duration: 3000
+          });
+        }
+      });
+    }
+  }
+
+  // Alternar estado de propuesta entre aprobada/rechazada
   toggleProposalStatus(proposalId: string, currentStatus: string): void {
     const newStatus = currentStatus === 'approved' ? 'rejected' : 'approved';
-    const confirmMessage = `¿Estás seguro que deseas cambiar el estado de esta propuesta de "${this.getStatusText(currentStatus)}" a "${this.getStatusText(newStatus)}"?`;
+    const actionText = newStatus === 'approved' ? 'aprobar' : 'rechazar';
     
-    if (confirm(confirmMessage)) {
-      this.thesisService.updateProposalStatus(proposalId, newStatus).subscribe({
-        next: () => {
-          this.snackBar.open(`Propuesta cambiada a ${this.getStatusText(newStatus)}`, 'Cerrar', { duration: 3000 });
-          this.loadProposedTopics(); // Solo recargar propuestas, no temas oficiales
+    if (confirm(`¿Estás seguro de que quieres ${actionText} esta propuesta?`)) {
+      this.thesisService.changeProposalStatus(proposalId, newStatus).subscribe({
+        next: (response) => {
+          this.snackBar.open(`Propuesta ${newStatus === 'approved' ? 'aprobada' : 'rechazada'} exitosamente`, 'Cerrar', {
+            duration: 3000
+          });
+          this.loadThesisTopics();
+          this.loadProposedTopics();
         },
         error: (error) => {
-          console.error('Error al cambiar estado de propuesta', error);
-          this.snackBar.open('Error al cambiar estado de propuesta', 'Cerrar', { duration: 3000 });
-        },
+          console.error('Error al cambiar estado de propuesta:', error);
+          this.snackBar.open('Error al cambiar estado de propuesta', 'Cerrar', {
+            duration: 3000
+          });
+        }
       });
     }
+  }
+
+  // Confirmar que el estudiante ha visto el estado de su propuesta
+  confirmProposalViewed(proposalId: string): void {
+    this.thesisService.confirmProposalViewed(proposalId, this.userName).subscribe({
+      next: (response) => {
+        this.snackBar.open('Confirmación registrada', 'Cerrar', {
+          duration: 2000
+        });
+        this.loadProposedTopics();
+      },
+      error: (error) => {
+        console.error('Error al confirmar visualización:', error);
+        this.snackBar.open('Error al registrar confirmación', 'Cerrar', {
+          duration: 3000
+        });
+      }
+    });
   }
 }

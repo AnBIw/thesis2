@@ -41,11 +41,20 @@
             <td mat-cell *matCellDef="let topic" [ngClass]="{'proposal-row': topic.isProposal, 'official-topic-row': !topic.isProposal}">
               <div class="title-content">
                 <mat-icon *ngIf="topic.isProposal" class="proposal-icon">
-                  {{ canViewProposalDetails(topic.proposedToProfessor || professor.name) ? 'lightbulb' : 'lock' }}
+                  {{ canViewProposalDetails(topic.proposedToProfessor || professor.name, topic.studentName) ? 'lightbulb' : 'lock' }}
                 </mat-icon>
+                
+                <!-- Indicador de inscripciones cerradas para temas oficiales -->
+                <mat-icon *ngIf="!topic.isProposal && topic.registrationOpen === false" 
+                          class="lock-icon" 
+                          title="Inscripciones cerradas" 
+                          color="warn">
+                  lock
+                </mat-icon>
+                
                 <span class="title-text">{{ topic.title }}</span>
                 <mat-icon
-                  *ngIf="topic.isProposal && !canViewProposalDetails(topic.proposedToProfessor || professor.name)"
+                  *ngIf="topic.isProposal && !canViewProposalDetails(topic.proposedToProfessor || professor.name, topic.studentName)"
                   class="privacy-icon">
                   visibility_off
                 </mat-icon>
@@ -59,8 +68,8 @@
             <td mat-cell *matCellDef="let topic" [ngClass]="{'proposal-row': topic.isProposal, 'official-topic-row': !topic.isProposal}">
               <div class="description-content">
                 <span
-                  [style.font-style]="topic.isProposal && !canViewProposalDetails(topic.proposedToProfessor || professor.name) ? 'italic' : 'normal'"
-                  [style.color]="topic.isProposal && !canViewProposalDetails(topic.proposedToProfessor || professor.name) ? '#666' : 'inherit'">
+                  [style.font-style]="topic.isProposal && !canViewProposalDetails(topic.proposedToProfessor || professor.name, topic.studentName) ? 'italic' : 'normal'"
+                  [style.color]="topic.isProposal && !canViewProposalDetails(topic.proposedToProfessor || professor.name, topic.studentName) ? '#666' : 'inherit'">
                   {{ topic.description }}
                 </span>
               </div>
@@ -74,22 +83,31 @@
               <div class="status-content">
                 <span *ngIf="!topic.isProposal" class="slots-number">{{ topic.avaliableSlots }}</span>
                 
-                <!-- Para propuestas: mostrar icono si está aprobada/rechazada, texto si está pendiente/preseleccionada -->
+                <!-- Para propuestas: mostrar iconos para todos los estados -->
                 <div *ngIf="topic.isProposal" class="proposal-status">
-                  <!-- Solo icono para aprobadas/rechazadas -->
+                  <!-- Icono para aprobadas -->
                   <mat-icon *ngIf="topic.status === 'approved'" 
                             class="status-icon approved-icon" 
                             title="Aprobada">
                     check_circle
                   </mat-icon>
+                  
+                  <!-- Icono para rechazadas -->
                   <mat-icon *ngIf="topic.status === 'rejected'" 
                             class="status-icon rejected-icon" 
                             title="Rechazada">
                     cancel
                   </mat-icon>
                   
-                  <!-- Texto para pendientes/preseleccionadas -->
-                  <span *ngIf="topic.status === 'pending' || topic.status === 'pre-selected'" 
+                  <!-- Icono para preseleccionadas -->
+                  <mat-icon *ngIf="topic.status === 'pre-selected'" 
+                            class="status-icon preselected-icon" 
+                            title="Preseleccionada">
+                    star
+                  </mat-icon>
+                  
+                  <!-- Solo texto para pendientes -->
+                  <span *ngIf="topic.status === 'pending'" 
                         [ngClass]="getStatusBadgeClass(topic.status)">
                     {{ getStatusText(topic.status) }}
                   </span>
@@ -141,12 +159,38 @@
             <td mat-cell *matCellDef="let topic" [ngClass]="{'proposal-row': topic.isProposal, 'official-topic-row': !topic.isProposal}">
               <!-- Acciones para temas oficiales -->
               <div *ngIf="!topic.isProposal">
-                <button mat-icon-button *ngIf="(userRole === 'professor' && userName === topic.professor) || userRole === 'admin'"
+                <!-- Indicador si el tema proviene de una propuesta aprobada -->
+                <div *ngIf="topic.fromApprovedProposal && (userRole === 'professor' || userRole === 'admin')" 
+                     class="approved-proposal-indicator">
+                  <span class="revert-button"
+                        *ngIf="userRole === 'professor' && userName === professor.name"
+                        (click)="revertApprovedProposal(topic.originalProposalId, topic.title)"
+                        title="Revertir a propuesta pendiente - Elimina el tema oficial y permite revisar nuevamente la propuesta de {{ topic.proposalStudentName }}">
+                    aceptada
+                    <mat-icon class="change-icon">sync</mat-icon>
+                  </span>
+                </div>
+                
+                <!-- Botones normales para temas oficiales -->
+                <button mat-icon-button *ngIf="((userRole === 'professor' && userName === topic.professor) || userRole === 'admin') && !topic.fromApprovedProposal"
                   (click)="deleteTopic(topic.title)"
                   title="Eliminar tema">
                   <mat-icon>delete</mat-icon>
                 </button>
-                <button mat-icon-button *ngIf="userRole === 'students'" (click)="enrollStudent(topic.title)">
+
+                <!-- Botón para abrir/cerrar inscripciones (solo para profesores propietarios) -->
+                <!-- DEBUG: userRole={{userRole}}, userName={{userName}}, topic.professor={{topic.professor}}, isProposal={{topic.isProposal}} -->
+                <button mat-icon-button *ngIf="userRole === 'professor' && userName === topic.professor && !topic.isProposal"
+                  (click)="toggleRegistration(topic)"
+                  [title]="topic.registrationOpen ? 'Cerrar inscripciones' : 'Abrir inscripciones'"
+                  [color]="topic.registrationOpen ? 'warn' : 'primary'">
+                  <mat-icon>{{ topic.registrationOpen ? 'lock_open' : 'lock' }}</mat-icon>
+                </button>
+
+                <button mat-icon-button *ngIf="userRole === 'students'" 
+                  (click)="enrollStudent(topic.title)"
+                  [disabled]="!topic.registrationOpen"
+                  [title]="topic.registrationOpen ? 'Inscribirse' : 'Inscripciones cerradas'">
                   <mat-icon>person_add</mat-icon>
                 </button>
                 <button mat-icon-button *ngIf="userRole === 'students'" (click)="unsubscribeStudent(topic.title)">

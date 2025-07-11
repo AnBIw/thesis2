@@ -70,4 +70,38 @@ export class ThesisService {
     updateProposalStatus(proposalId: string, status: 'approved' | 'rejected'): Observable<ProposedTopic> {
         return this.http.patch<ProposedTopic>(`${this.url1}/proposals/${proposalId}`, { status });
     }
+
+    // Método más flexible para cambiar cualquier estado de propuesta
+    changeProposalStatus(proposalId: string, status: 'pending' | 'pre-selected' | 'approved' | 'rejected'): Observable<ProposedTopic> {
+        return this.http.patch<ProposedTopic>(`${this.url1}/proposals/${proposalId}`, { status });
+    }
+
+    // Métodos para manejar el tema actual del estudiante
+    updateStudentTesisActual(studentName: string, tesisData: any): Observable<any> {
+        return this.http.patch<any>(`${this.url1}/students/${studentName}/tesis-actual`, tesisData);
+    }
+
+    clearStudentTesisActual(studentName: string): Observable<any> {
+        return this.http.delete<any>(`${this.url1}/students/${studentName}/tesis-actual`);
+    }
+
+    getStudentTesisActual(studentName: string): Observable<any> {
+        return this.http.get<any>(`${this.url1}/students/${studentName}/tesis-actual`);
+    }
+
+    confirmProposalViewed(proposalId: string, studentName: string): Observable<any> {
+        return this.http.post<any>(`${this.url1}/proposals/${proposalId}/confirm-viewed`, { studentName });
+    }
+
+    getStudentPreselectedProposals(studentName: string): Observable<ProposedTopic[]> {
+        return this.http.get<ProposedTopic[]>(`${this.url1}/students/${studentName}/preselected-proposals`);
+    }
+
+    // Abrir/cerrar inscripciones de un tema
+    toggleTopicRegistration(topicTitle: string, professorName: string, registrationOpen: boolean): Observable<any> {
+        return this.http.patch<any>(`${this.url1}/topics/${topicTitle}/registration`, { 
+            professorName, 
+            registrationOpen 
+        });
+    }
 }

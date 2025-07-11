@@ -3,10 +3,19 @@
       <div class="student-header">
         <div class="student-greeting-section">
           <h3 class="student-greeting">¡Hola, {{ StudentName }}!</h3>
+          <div class="thesis-status">
+            <mat-icon [ngClass]="tesisActual ? 'assigned-icon' : 'pending-icon'">
+              {{ tesisActual ? 'assignment_turned_in' : 'assignment' }}
+            </mat-icon>
+            <span [ngClass]="tesisActual ? 'status-assigned' : 'status-pending'">
+              {{ getTesisStatus() }}
+            </span>
+          </div>
         </div>
-        <button mat-raised-button color="accent" (click)="openProposeTopicForm()" class="propose-btn">
+        <button mat-raised-button color="accent" (click)="openProposeTopicForm()" 
+                class="propose-btn" [disabled]="!!tesisActual">
           <mat-icon>lightbulb_outline</mat-icon>
-          Proponer Tema
+          {{ tesisActual ? 'Tema ya asignado' : 'Proponer Tema a un profesor' }}
         </button>
       </div>
       <mat-card-content>

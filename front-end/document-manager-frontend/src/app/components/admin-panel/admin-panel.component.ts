@@ -89,7 +89,7 @@ export class AdminPanelComponent {
     }
 
     // Validar contraseña mínima
-    if (password.length < 8) {
+    if (password.length < 3) {
       return false;
     }
 
