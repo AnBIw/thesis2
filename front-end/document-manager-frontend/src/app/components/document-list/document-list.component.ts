@@ -68,7 +68,6 @@ export class DocumentListComponent implements OnInit {
   }
 
   previewDocument(id: string): void {
-    console.log('Previewing document with ID:', id);
     this.documentService.previewDocument(id).subscribe({
       next: (blob) => {
         const fileURL = URL.createObjectURL(blob);

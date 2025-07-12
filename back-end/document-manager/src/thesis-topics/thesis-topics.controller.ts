@@ -19,7 +19,6 @@ export class ThesisTopicsController {
 
   @Delete(':id')
   delete(@Param('id') tittle: string): void {
-    console.log(`Deleting thesis topic with id: ${tittle}`);
     this.thesisTopicsService.delete(tittle);
   }
   @Post(':id/enroll')
@@ -107,5 +106,18 @@ export class ThesisTopicsController {
     @Body('registrationOpen') registrationOpen: boolean,
   ): Promise<any> {
     return await this.thesisTopicsService.toggleTopicRegistration(professorName, topicTitle, registrationOpen);
+  }
+
+  @Post('proposals/:id/confirm-viewed')
+  async confirmProposalViewed(
+    @Param('id') proposalId: string,
+    @Body('studentName') studentName: string,
+  ): Promise<any> {
+    return await this.thesisTopicsService.confirmProposalViewed(proposalId, studentName);
+  }
+
+  @Post('cleanup/duplicate-topics')
+  async cleanupDuplicateTopics(): Promise<any> {
+    return await this.thesisTopicsService.cleanupDuplicateTopics();
   }
 }

@@ -97,7 +97,6 @@ export class ProposeTopicFormComponent implements OnInit {
     // Llamar al servicio para enviar la propuesta
     this.thesisService.proposeThesisTopic(this.proposedTopic).subscribe({
       next: (response) => {
-        console.log('Propuesta enviada exitosamente:', response);
         
         // Emitir el evento con el tema propuesto
         this.topicProposed.emit(response);

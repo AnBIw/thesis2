@@ -97,6 +97,11 @@ export class ThesisService {
         return this.http.get<ProposedTopic[]>(`${this.url1}/students/${studentName}/preselected-proposals`);
     }
 
+    // Limpiar temas oficiales duplicados
+    cleanupDuplicateTopics(): Observable<any> {
+        return this.http.post<any>(`${this.url1}/cleanup/duplicate-topics`, {});
+    }
+
     // Abrir/cerrar inscripciones de un tema
     toggleTopicRegistration(topicTitle: string, professorName: string, registrationOpen: boolean): Observable<any> {
         return this.http.patch<any>(`${this.url1}/topics/${topicTitle}/registration`, { 

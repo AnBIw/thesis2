@@ -71,7 +71,6 @@ export class ThesisTopicsService {
         await user.save();
       }
     }
-    //console.log('Estudiante inscrito correctamente:', email);
   }
   async unsubscribeStudent(title: string, email: string): Promise<void> {
     const users = await this.userModel.find();
@@ -82,7 +81,6 @@ export class ThesisTopicsService {
         if (index !== -1) {
           userTopic.enrolledStudents.splice(index, 1);
           await user.save();
-          //console.log('Estudiante desuscrito correctamente:', email);
         } else {
           throw new BadRequestException('El estudiante no está inscrito en este tema');
         }
@@ -129,7 +127,6 @@ export class ThesisTopicsService {
     professor.proposedTopics.push(newProposal);
     await professor.save();
     
-    console.log('Nueva propuesta de tema agregada al profesor:', newProposal);
     return newProposal;
   }
 
@@ -205,7 +202,6 @@ export class ThesisTopicsService {
     foundProposal.updatedAt = new Date();
 
     await foundProfessor.save();
-    console.log(`Propuesta ${proposalId} preseleccionada`);
     return foundProposal;
   }
 
@@ -234,50 +230,10 @@ export class ThesisTopicsService {
     foundProposal.status = status;
     foundProposal.updatedAt = new Date();
 
-    // Si la propuesta es aprobada, convertirla en un tema oficial
-    if (status === 'approved') {
-      // Verificar si ya existe un tema con este título para evitar duplicados
-      const existingTopic = foundProfessor.topics.find((topic: any) => 
-        topic.title.trim().toLowerCase() === foundProposal.title.trim().toLowerCase()
-      );
-
-      if (!existingTopic) {
-        const newTopic = {
-          title: foundProposal.title,
-          description: foundProposal.description,
-          avaliableSlots: 1, // Por defecto, un cupo disponible
-          enrolledStudents: [foundProposal.studentName], // El estudiante que propuso ya está inscrito
-          registrationOpen: true, // Por defecto, las inscripciones están abiertas
-        };
-
-        foundProfessor.topics.push(newTopic);
-        console.log('Propuesta aprobada y convertida en tema oficial:', newTopic);
-      }
-    }
-
-    // Si la propuesta cambia de aprobada a cualquier otro estado, eliminar el tema oficial correspondiente
-    if (previousStatus === 'approved' && status !== 'approved') {
-      const topicIndex = foundProfessor.topics.findIndex((topic: any) => 
-        topic.title.trim().toLowerCase() === foundProposal.title.trim().toLowerCase()
-      );
-
-      if (topicIndex !== -1) {
-        foundProfessor.topics.splice(topicIndex, 1);
-        console.log('Tema oficial eliminado al cambiar propuesta de aprobada a:', status, foundProposal.title);
-
-        // También limpiar la tesis actual del estudiante si tenía este tema asignado
-        const student = await this.userModel.findOne({ name: foundProposal.studentName });
-        if (student && student.tesisActual && 
-            student.tesisActual.titulo.trim().toLowerCase() === foundProposal.title.trim().toLowerCase()) {
-          student.tesisActual = null;
-          await student.save();
-          console.log('Tesis actual del estudiante limpiada:', foundProposal.studentName);
-        }
-      }
-    }
+    // NO crear tema oficial automáticamente cuando se aprueba
+    // El tema se asignará como tesisActual del estudiante cuando acepte la propuesta
 
     await foundProfessor.save();
-    console.log(`Propuesta ${proposalId} actualizada a estado: ${status}`);
     return foundProposal;
   }
 
@@ -293,7 +249,6 @@ export class ThesisTopicsService {
           professor.proposedTopics.splice(index, 1);
           await professor.save();
           found = true;
-          console.log(`Propuesta ${proposalId} eliminada`);
           break;
         }
       }
@@ -320,7 +275,6 @@ export class ThesisTopicsService {
     };
 
     await student.save();
-    console.log(`Tesis actual actualizada para estudiante ${studentName}:`, student.tesisActual);
     return student.tesisActual;
   }
 
@@ -341,7 +295,6 @@ export class ThesisTopicsService {
 
     student.tesisActual = null;
     await student.save();
-    console.log(`Tesis actual limpiada para estudiante ${studentName}`);
   }
 
   async getStudentPreselectedProposals(studentName: string): Promise<any[]> {
@@ -386,7 +339,76 @@ export class ThesisTopicsService {
     topic.registrationOpen = registrationOpen;
     await professor.save();
 
-    console.log(`Inscripciones para "${topicTitle}" ${registrationOpen ? 'abiertas' : 'cerradas'} por ${professorName}`);
     return topic;
+  }
+
+  // Confirmar que el estudiante ha visto una propuesta
+  async confirmProposalViewed(proposalId: string, studentName: string): Promise<any> {
+    const student = await this.userModel.findOne({ name: studentName, role: 'students' });
+    if (!student) {
+      throw new NotFoundException('Estudiante no encontrado');
+    }
+
+    const proposal = student.proposedTopics.find((p: any) => p.proposalId === proposalId);
+    if (!proposal) {
+      throw new NotFoundException('Propuesta no encontrada');
+    }
+
+    // Marcar como vista
+    proposal.viewed = true;
+    proposal.viewedAt = new Date();
+    await student.save();
+
+    return { message: 'Confirmación de vista registrada correctamente' };
+  }
+
+  // Limpiar temas oficiales duplicados que se crearon automáticamente de propuestas
+  async cleanupDuplicateTopics(): Promise<any> {
+    const professors = await this.userModel.find({ role: 'professor' }).exec();
+    let cleanedCount = 0;
+
+    for (const professor of professors) {
+      if (professor.topics && professor.proposedTopics) {
+        // Buscar temas oficiales que corresponden a propuestas aprobadas
+        const topicsToRemove: number[] = [];
+
+        for (let i = 0; i < professor.topics.length; i++) {
+          const topic = professor.topics[i];
+          
+          // Verificar si este tema corresponde a una propuesta aprobada
+          const relatedProposal = professor.proposedTopics.find((proposal: any) => 
+            proposal.title.trim().toLowerCase() === topic.title.trim().toLowerCase() &&
+            proposal.status === 'approved'
+          );
+
+          if (relatedProposal) {
+            // Solo eliminar si hay un estudiante con este tema como tesisActual
+            const student = await this.userModel.findOne({ 
+              name: relatedProposal.studentName,
+              'tesisActual.titulo': topic.title
+            });
+
+            if (student) {
+              topicsToRemove.push(i);
+              cleanedCount++;
+            }
+          }
+        }
+
+        // Eliminar los temas identificados (en orden inverso para no afectar los índices)
+        for (let i = topicsToRemove.length - 1; i >= 0; i--) {
+          professor.topics.splice(topicsToRemove[i], 1);
+        }
+
+        if (topicsToRemove.length > 0) {
+          await professor.save();
+        }
+      }
+    }
+
+    return { 
+      message: `Se eliminaron ${cleanedCount} temas oficiales duplicados`,
+      cleanedCount 
+    };
   }
 }

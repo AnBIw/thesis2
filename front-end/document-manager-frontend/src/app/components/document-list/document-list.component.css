@@ -14,15 +14,14 @@ mat-card {
   font-size: 1.2rem;
   color: #1a237e;
   font-weight: bold;
-  margin-left: 200px;
-  margin-bottom: 8px;
+  margin-left: 120px;
   text-transform: uppercase;
 }
 
 .search-section {
   display: flex;
   justify-content: center;
-  margin-bottom: 18px;
+  margin-bottom: -16px;
 }
 
 .list-title {

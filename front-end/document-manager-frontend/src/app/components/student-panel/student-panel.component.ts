@@ -1,6 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { DocumentListComponent } from '../document-list/document-list.component';
 import { TopicListComponent } from '../topic-list/topic-list.component';
+
+    // Usar un snackBar más duradero para mostrar el mensaje completoopic-list/topic-list.component';
 import { ProposeTopicFormComponent } from '../propose-topic-form/propose-topic-form.component';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -62,7 +64,6 @@ export class StudentPanelComponent implements OnInit, OnDestroy {
   private subscribeToTemaUpdates(): void {
     this.temaActualizadoSubscription = this.temaActualService.temaActualizado$.subscribe({
       next: (tesisActual) => {
-        console.log('Tema actualizado recibido:', tesisActual);
         this.tesisActual = tesisActual;
       },
       error: (error) => {
@@ -88,7 +89,6 @@ export class StudentPanelComponent implements OnInit, OnDestroy {
         }
       },
       error: (error) => {
-        console.log('No hay tema actual asignado o error al cargar:', error);
         this.tesisActual = null;
       }
     });
@@ -110,10 +110,12 @@ export class StudentPanelComponent implements OnInit, OnDestroy {
   }
 
   onTopicProposed(topic: any): void {
-    console.log('Tema propuesto:', topic);
     this.showProposeForm = false;
-    // Aquí puedes agregar lógica adicional, como mostrar un mensaje de confirmación
-    // o actualizar la lista de temas
+    
+    // Notificar que las propuestas han sido actualizadas para que otros componentes se actualicen
+    this.temaActualService.notificarPropuestasActualizadas();
+    
+    console.log('Nueva propuesta creada, notificando actualización:', topic);
   }
 
   // Método para limpiar el tema actual (útil para testing o casos especiales)
@@ -124,7 +126,6 @@ export class StudentPanelComponent implements OnInit, OnDestroy {
         localStorage.removeItem('tesisActual');
         // Notificar el cambio
         this.temaActualService.notificarTemaLimpiado();
-        console.log('Tema actual limpiado');
       },
       error: (error) => {
         console.error('Error al limpiar tema actual', error);
@@ -140,17 +141,12 @@ export class StudentPanelComponent implements OnInit, OnDestroy {
 
   // Verificar propuestas preseleccionadas con comentarios
   private checkPreselectedProposals(): void {
-    console.log('Verificando propuestas preseleccionadas para:', this.StudentName);
     
     this.thesisService.getStudentPreselectedProposals(this.StudentName).subscribe({
       next: (proposals) => {
-        console.log('Propuestas preseleccionadas recibidas:', proposals);
-        if (proposals.length > 0) {
-          console.log('Mostrando notificaciones para', proposals.length, 'propuestas');
+        if (proposals && proposals.length > 0) {
           // Mostrar notificaciones de forma secuencial para evitar superposición
           this.showSequentialNotifications(proposals);
-        } else {
-          console.log('No hay propuestas preseleccionadas para mostrar');
         }
       },
       error: (error) => {
@@ -179,38 +175,42 @@ export class StudentPanelComponent implements OnInit, OnDestroy {
 
   // Mostrar notificación de preselección
   private showPreselectionNotification(proposal: any, onComplete?: () => void): void {
-    console.log('Mostrando notificación para propuesta:', proposal.title);
     
-    const message = `¡Tu propuesta "${proposal.title}" ha sido preseleccionada!
+    let notificationTitle = '';
+    let buttonText = 'Ver detalles';
+    
+    if (proposal.status === 'approved') {
+      notificationTitle = `¡Tu propuesta "${proposal.title}" ha sido APROBADA!`;
+    } else {
+      notificationTitle = `¡Propuesta preseleccionada! "${proposal.title}"`;
+    }
+
+    const message = `${proposal.status === 'approved' ? '¡FELICIDADES!' : ''} Tu propuesta "${proposal.title}" ha sido ${proposal.status === 'approved' ? 'APROBADA' : 'preseleccionada'}!
 
 Comentario del profesor: "${proposal.preselectionComment}"
 
 Propuesta: ${proposal.title}
-Profesor: ${proposal.proposedToProfessor}`;
+Profesor: ${proposal.proposedToProfessor}
 
-    console.log('Mensaje completo:', message);
+${proposal.status === 'approved' ? 'Ve a la lista de temas oficiales y haz clic en "He visto" para asignarla como tu tesis actual.' : 'El profesor está considerando tu propuesta.'}`;
 
     // Usar un snackBar más duradero para mostrar el mensaje completo
     const snackBarRef = this.snackBar.open(
-      `¡Propuesta preseleccionada! "${proposal.title}"`, 
-      'Ver Detalles', 
+      notificationTitle, 
+      buttonText, 
       { 
-        duration: 8000, // Reducir un poco la duración para que no se acumulen tanto
-        panelClass: ['preselection-notification']
+        duration: 8000,
+        panelClass: proposal.status === 'approved' ? ['approved-notification'] : ['preselection-notification']
       }
     );
 
-    console.log('SnackBar mostrado');
-
-    // Si hace clic en "Ver Detalles", mostrar el mensaje completo
+    // Si hace clic en "Ver detalles", mostrar el mensaje completo
     snackBarRef.onAction().subscribe(() => {
-      console.log('Usuario hizo clic en Ver Detalles');
       alert(message);
     });
 
     // Cuando la notificación se cierre (por tiempo o acción), llamar al callback
     snackBarRef.afterDismissed().subscribe(() => {
-      console.log('Notificación cerrada para:', proposal.title);
       if (onComplete) {
         onComplete();
       }

@@ -28,6 +28,23 @@
   box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3) !important;
 }
 
+/* Estilos para notificaciones */
+::ng-deep .preselection-notification {
+  background-color: #2196f3 !important;
+  color: white !important;
+}
+
+::ng-deep .approved-notification {
+  background-color: #4caf50 !important;
+  color: white !important;
+}
+
+::ng-deep .preselection-notification .mat-mdc-snack-bar-action,
+::ng-deep .approved-notification .mat-mdc-snack-bar-action {
+  color: white !important;
+  font-weight: bold !important;
+}
+
 .student-subtitle {
   font-size: 0.9rem;
   margin: 0;

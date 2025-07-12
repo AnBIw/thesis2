@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -12,6 +12,7 @@ import { ThesisTopic } from '../../models/thesis-topic.model';
 import { MatTableModule } from '@angular/material/table'; 
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { TemaActualService } from '../../services/tema-actual.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'topic-list',
@@ -31,7 +32,7 @@ import { TemaActualService } from '../../services/tema-actual.service';
   templateUrl: './topic-list.component.html',
   styleUrls: ['./topic-list.component.css'],
 })
-export class TopicListComponent implements OnInit {
+export class TopicListComponent implements OnInit, OnDestroy {
   thesisTopics: ThesisTopic[] = [];
   professors: { name: string; specialty: string }[] = [];
   proposedTopics: any[] = []; // Propuestas de temas
@@ -39,6 +40,8 @@ export class TopicListComponent implements OnInit {
   userRole: string = localStorage.getItem('userRole') || '';
   email: string = localStorage.getItem('email') || '';
   userName: string = localStorage.getItem('name') || ''; 
+  
+  private propuestasSubscription?: Subscription;
 
   constructor(
     private thesisService: ThesisService,
@@ -51,6 +54,19 @@ export class TopicListComponent implements OnInit {
     this.getProfessors();
     this.getThesisTopics();
     this.loadProposedTopics();
+    
+    // Suscribirse a las actualizaciones de propuestas
+    this.propuestasSubscription = this.temaActualService.propuestasActualizadas$.subscribe(() => {
+      console.log('Propuestas actualizadas, recargando lista...');
+      this.loadProposedTopics();
+    });
+  }
+
+  ngOnDestroy(): void {
+    // Limpiar suscripciones para evitar memory leaks
+    if (this.propuestasSubscription) {
+      this.propuestasSubscription.unsubscribe();
+    }
   }
   //cargo los temas de tesis
   loadThesisTopics(): void {
@@ -143,8 +159,10 @@ export class TopicListComponent implements OnInit {
 
   // Cargar propuestas de temas
   loadProposedTopics(): void {
+    console.log('Cargando propuestas de temas...');
     this.thesisService.getProposedTopics().subscribe({
       next: (response) => {
+        console.log('Propuestas recibidas:', response);
         this.proposedTopics = response;
       },
       error: (error) => {
@@ -159,11 +177,10 @@ export class TopicListComponent implements OnInit {
     - ESTUDIANTES: Ven todas las propuestas del profesor, EXCEPTO las aprobadas de otros estudiantes
                   (las propuestas aprobadas propias las ven hasta que confirmen que las vieron)
     
-    - PROFESORES/ADMINS: NO ven propuestas aprobadas porque estas se convierten automáticamente 
-                        en temas oficiales, evitando duplicación en la vista
+    - PROFESORES/ADMINS: Ven TODAS las propuestas dirigidas a ellos, incluyendo las aprobadas,
+                        para poder cambiar el estado si es necesario (ej: de aprobada a rechazada)
     
-    Flujo: Propuesta → Aprobada → Tema Oficial + Propuesta visible solo para el estudiante autor
-           → Estudiante confirma → Propuesta eliminada, solo queda Tema Oficial
+    Flujo: Propuesta → Aprobada → Estudiante confirma → Propuesta eliminada + tesisActual asignada
     */
     
   // Método para combinar temas oficiales y propuestas por profesor
@@ -179,6 +196,7 @@ export class TopicListComponent implements OnInit {
         if (proposal.proposedToProfessor !== professorName) return false;
         
         // Si es una propuesta aprobada, solo mostrarla si es del estudiante actual
+        // Y además verificar que no haya sido ya procesada (el estudiante no tenga tesisActual)
         if (proposal.status === 'approved') {
           return proposal.studentName === this.userName;
         }
@@ -187,32 +205,13 @@ export class TopicListComponent implements OnInit {
         return true;
       });
     } else {
-      // Para profesores y admins: NO mostrar propuestas aprobadas como propuestas separadas
-      // Las propuestas aprobadas se muestran integradas en los temas oficiales
+      // Para profesores y admins: mostrar TODAS las propuestas dirigidas al profesor
+      // Los profesores necesitan ver incluso las propuestas aprobadas para poder cambiar su estado si es necesario
       proposals = this.proposedTopics.filter(proposal => 
-        proposal.proposedToProfessor === professorName && proposal.status !== 'approved'
+        proposal.proposedToProfessor === professorName
       );
     }
 
-    // Para profesores: agregar información de propuestas aprobadas a los temas oficiales correspondientes
-    if (this.userRole === 'professor' || this.userRole === 'admin') {
-      const approvedProposals = this.proposedTopics.filter(proposal => 
-        proposal.proposedToProfessor === professorName && proposal.status === 'approved'
-      );
-
-      // Marcar temas oficiales que provienen de propuestas aprobadas
-      officialTopics.forEach(topic => {
-        const relatedProposal = approvedProposals.find(proposal => 
-          proposal.title.trim().toLowerCase() === topic.title.trim().toLowerCase()
-        );
-        if (relatedProposal) {
-          (topic as any).fromApprovedProposal = true;
-          (topic as any).originalProposalId = relatedProposal._id;
-          (topic as any).proposalStudentName = relatedProposal.studentName;
-        }
-      });
-    }
-    
     // Mapear propuestas para que tengan la estructura correcta
     const mappedProposals = proposals.map(proposal => ({
       title: this.canViewProposalDetails(proposal.proposedToProfessor, proposal.studentName) ? proposal.title : 'Propuesta Privada',
@@ -229,12 +228,6 @@ export class TopicListComponent implements OnInit {
       justification: proposal.justification,
       preselectionComment: proposal.preselectionComment
     }));
-
-    console.log('Professor:', professorName);
-    console.log('Official topics:', officialTopics.length);
-    console.log('Proposals:', mappedProposals.length);
-    console.log('User role:', this.userRole);
-    console.log('User name:', this.userName);
 
     return [...officialTopics, ...mappedProposals];
   }
@@ -512,6 +505,39 @@ ${proposal.preselectionComment ? `Comentario del profesor: ${proposal.preselecti
 
   // Confirmar que el estudiante ha visto el estado de su propuesta
   confirmProposalViewed(proposalId: string): void {
+    // Primero, encontrar la propuesta para verificar su estado
+    const currentProposal = this.findProposalById(proposalId);
+    
+    if (!currentProposal) {
+      this.snackBar.open('Error: Propuesta no encontrada', 'Cerrar', {
+        duration: 3000
+      });
+      return;
+    }
+
+    // Si la propuesta está aprobada, mostrar confirmación especial
+    if (currentProposal.status === 'approved') {
+      const confirmed = confirm(`¡FELICIDADES! Tu propuesta "${currentProposal.originalTitle}" ha sido APROBADA.\n\n¿Deseas asignarla como tu tesis actual?`);
+      
+      if (confirmed) {
+        this.assignProposalAsCurrentTesis(currentProposal);
+        return;
+      }
+    }
+
+    // Si la propuesta está rechazada, mostrar confirmación de eliminación
+    if (currentProposal.status === 'rejected') {
+      const confirmed = confirm(`Tu propuesta "${currentProposal.originalTitle}" ha sido RECHAZADA.\n\nAl confirmar que la has visto, se eliminará permanentemente de tu lista.\n\n¿Deseas continuar?`);
+      
+      if (confirmed) {
+        this.deleteRejectedProposal(proposalId, currentProposal.originalTitle);
+        return;
+      } else {
+        return; // El usuario canceló, no hacer nada
+      }
+    }
+
+    // Para propuestas preseleccionadas o si el usuario no quiere asignar propuesta aprobada
     this.thesisService.confirmProposalViewed(proposalId, this.userName).subscribe({
       next: (response) => {
         this.snackBar.open('Confirmación registrada', 'Cerrar', {
@@ -524,6 +550,137 @@ ${proposal.preselectionComment ? `Comentario del profesor: ${proposal.preselecti
         this.snackBar.open('Error al registrar confirmación', 'Cerrar', {
           duration: 3000
         });
+      }
+    });
+  }
+
+  // Buscar una propuesta por ID
+  private findProposalById(proposalId: string): any {
+    for (const professor of this.professors) {
+      const topics = this.getCombinedTopicsByProfessor(professor.name);
+      const proposal = topics.find(topic => topic.isProposal && topic.proposalId === proposalId);
+      if (proposal) {
+        return proposal;
+      }
+    }
+    return null;
+  }
+
+  // Asignar una propuesta aprobada como tesis actual del estudiante
+  private assignProposalAsCurrentTesis(proposal: any): void {
+    console.log('Asignando propuesta como tesis actual:', proposal);
+    const tesisData = {
+      titulo: proposal.originalTitle,
+      descripcion: proposal.originalDescription,
+      profesor: proposal.proposedToProfessor,
+      estado: 'aprobado'
+    };
+
+    this.thesisService.updateStudentTesisActual(this.userName, tesisData).subscribe({
+      next: (response) => {
+        console.log('Tesis asignada exitosamente:', response);
+        
+        // Notificar al servicio que el tema actual ha sido actualizado
+        this.temaActualService.notificarTemaActualizado(response);
+        
+        // Confirmar que vio la propuesta también
+        this.thesisService.confirmProposalViewed(proposal.proposalId, this.userName).subscribe();
+        
+        // Eliminar la propuesta aprobada de la lista ya que ahora es su tesis actual
+        console.log('Eliminando propuesta aprobada:', proposal.proposalId);
+        this.thesisService.deleteProposal(proposal.proposalId).subscribe({
+          next: () => {
+            console.log('Propuesta aprobada eliminada exitosamente');
+            
+            // Limpiar temas oficiales duplicados que se crearon automáticamente
+            this.thesisService.cleanupDuplicateTopics().subscribe({
+              next: (cleanupResponse) => {
+                console.log('Limpieza completada:', cleanupResponse);
+              },
+              error: (cleanupError) => {
+                console.error('Error en limpieza:', cleanupError);
+              }
+            });
+            
+            this.snackBar.open(
+              `¡Tu propuesta "${proposal.originalTitle}" ha sido asignada como tu tesis actual!`,
+              'Cerrar',
+              { 
+                duration: 5000,
+                panelClass: ['success-snackbar']
+              }
+            );
+            
+            this.loadProposedTopics();
+          },
+          error: (deleteError) => {
+            console.error('Error al eliminar propuesta después de asignación:', deleteError);
+            
+            // Aunque no se pudo eliminar, intentar la limpieza
+            this.thesisService.cleanupDuplicateTopics().subscribe({
+              next: (cleanupResponse) => {
+                console.log('Limpieza completada:', cleanupResponse);
+              },
+              error: (cleanupError) => {
+                console.error('Error en limpieza:', cleanupError);
+              }
+            });
+            
+            // Aunque no se pudo eliminar, la asignación fue exitosa
+            this.snackBar.open(
+              `¡Tu propuesta "${proposal.originalTitle}" ha sido asignada como tu tesis actual!`,
+              'Cerrar',
+              { 
+                duration: 5000,
+                panelClass: ['success-snackbar']
+              }
+            );
+            
+            this.loadProposedTopics();
+          }
+        });
+      },
+      error: (error) => {
+        console.error('Error al asignar tesis actual:', error);
+        this.snackBar.open(
+          'Error al asignar la propuesta como tesis actual. Intenta de nuevo.',
+          'Cerrar',
+          { 
+            duration: 3000,
+            panelClass: ['error-snackbar']
+          }
+        );
+      }
+    });
+  }
+
+  // Eliminar una propuesta rechazada cuando el estudiante confirma que la ha visto
+  private deleteRejectedProposal(proposalId: string, proposalTitle: string): void {
+    console.log('Eliminando propuesta rechazada:', proposalId);
+    this.thesisService.deleteProposal(proposalId).subscribe({
+      next: (response) => {
+        console.log('Propuesta eliminada exitosamente:', response);
+        this.snackBar.open(
+          `La propuesta rechazada "${proposalTitle}" ha sido eliminada de tu lista.`,
+          'Cerrar',
+          { 
+            duration: 4000,
+            panelClass: ['info-snackbar']
+          }
+        );
+        
+        this.loadProposedTopics();
+      },
+      error: (error) => {
+        console.error('Error al eliminar propuesta rechazada:', error);
+        this.snackBar.open(
+          'Error al eliminar la propuesta rechazada. Intenta de nuevo.',
+          'Cerrar',
+          { 
+            duration: 3000,
+            panelClass: ['error-snackbar']
+          }
+        );
       }
     });
   }

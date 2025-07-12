@@ -59,7 +59,6 @@ export class AddTopicFormComponent {
           avaliableSlots: 0,
           enrolledStudents: []
         };
-        console.log('Thesis topic added successfully', response);
       },
       error: (error) => {
         console.error('Error adding thesis topic', error);
